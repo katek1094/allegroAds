@@ -8,7 +8,7 @@ def generate_accounts_list():
 
     accounts_list = []
 
-    row = 2
+    row = 3
     col = 1
     while True:
         value = ws.cell(row=row, column=col).value
