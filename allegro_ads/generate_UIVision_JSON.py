@@ -1,6 +1,6 @@
 import json
 
-from generate_accounts_list import generate_accounts_list
+from allegro_ads.generate_accounts_list import generate_accounts_list
 
 accounts_list = generate_accounts_list()
 
@@ -81,10 +81,10 @@ for account in accounts_list:
     array.append(open_agency_panel)
     array.append(open_clients_list)
     array.append(open_client_account)
-    array.append(open_stats)
-    array.append(open_calendar)
-    array.append(select_last_week)
-    array.append(update)
+    # array.append(open_stats)
+    # array.append(open_calendar)
+    # array.append(select_last_week)
+    # array.append(update)
 
-with open('macro.json', 'w', encoding='utf-8') as f:
+with open('../macro.json', 'w', encoding='utf-8') as f:
     json.dump(array, f)
