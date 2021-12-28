@@ -22,6 +22,7 @@ class Commands:
 
         # calendar range options
         self.select_yesterday = create_click_command("xpath=//*[text()='Wczoraj']")
+        self.select_today = create_click_command("xpath=//*[text()='Dzisiaj']")
         self.select_last_week = create_click_command("xpath=//*[text()='Ostatnie 7 dni']")
         self.select_last_month = create_click_command("xpath=//*[text()='Ostatnie 30 dni']")
         self.select_last_billing_month = create_click_command("xpath=//*[text()='Poprzedni okres rozliczeniowy']")

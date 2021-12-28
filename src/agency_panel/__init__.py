@@ -1,1 +1,2 @@
-from yesterday_stats import YesterdayStatsScraper
+from .stats_scraper import StatsScraper
+

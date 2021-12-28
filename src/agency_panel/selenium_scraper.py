@@ -24,8 +24,8 @@ class SeleniumScraper:
         self.driver.get(url)
         self.driver.maximize_window()
 
-    def sleep(self):
-        if self.sleep_mode:
+    def sleep(self, duration=None):
+        if self.sleep_mode or duration:
             time.sleep(random.randrange(self.SLEEP_TIME_MIN, self.SLEEP_TIME_MAX))
 
     def wait(self, element):
