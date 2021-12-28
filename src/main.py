@@ -1,6 +1,6 @@
-from allegro_ads.offers_scraper.account_scraper import AccountScraper
+from src.offers_scraper.account_scraper import AccountScraper
 from offers_scraper.excel_writer import ExcelWriter
-from allegro_ads.generate_accounts_list import generate_accounts_list
+from src.utils.generate_accounts_list import generate_accounts_list
 
 
 def scrape_account(username):

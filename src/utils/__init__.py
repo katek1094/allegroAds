@@ -1,0 +1,1 @@
+from generate_accounts_list import generate_accounts_list

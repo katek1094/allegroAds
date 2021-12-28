@@ -1,0 +1,1 @@
+from yesterday_stats import YesterdayStatsScraper
