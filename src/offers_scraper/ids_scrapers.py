@@ -6,6 +6,9 @@ import time
 
 
 class IdsScraper:
+    """
+    base class for BestOffersScraper and UrlIdsScraper
+    """
     allegro_url = 'https://allegro.pl'
     target_amount = 0
     ids = []
@@ -36,13 +39,18 @@ class IdsScraper:
 
 
 class BestOffersScraper(IdsScraper):
+    """
+    scrapes ids of offers from given username's store, filtered by accuracy or popularity
+    username - Allegro username/shop name
+    mode - decides how offers will be sorted (accuracy or popularity)
+    target_amount - how many offers will be scraped
+    """
     modes = ('accuracy', 'popularity')
 
-    def __init__(self, username, mode, target_amount):
+    def __init__(self, username: str, mode: str, target_amount: int):
         super().__init__(target_amount)
         if mode not in self.modes:
-            print('ERROR: unkown mode!')
-            return
+            raise ValueError('ERROR: unknown mode!')
         elif mode == self.modes[0]:
             self.driver.get(self.allegro_url + '/uzytkownik/' + username)
         elif mode == self.modes[1]:
@@ -50,19 +58,24 @@ class BestOffersScraper(IdsScraper):
 
         self.get_offers_ids()
         if self.target_amount > len(self.ids):
-            print('target amount was bigger than amount of offers to scrape!')
+            raise ValueError('target amount was bigger than amount of offers to scrape!')
         print('scraping finished')
         print(self.ids)
         self.driver.close()
 
 
 class UrlIdsScraper(IdsScraper):
-    def __init__(self, url, target_amount):
+    """
+    scrapes offers from given url (inside Allegro user's store
+    url - url of page inside Allegro user's store with offers to be scraped
+    target_amount - how many offers will be scraped
+    """
+    def __init__(self, url: str, target_amount: int):
         super().__init__(target_amount)
         self.driver.get(url)
         self.get_offers_ids()
         if self.target_amount > len(self.ids):
-            print('target amount was bigger than amount of offers to scrape!')
+            raise ValueError('target amount was bigger than amount of offers to scrape!')
         print('scraping finished')
         print(self.ids)
         self.driver.close()
