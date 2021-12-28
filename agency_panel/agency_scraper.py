@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from dotenv import load_dotenv
 
-from selenium_scraper import SeleniumScraper
+from .selenium_scraper import SeleniumScraper
 
 load_dotenv()
 

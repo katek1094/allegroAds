@@ -4,8 +4,7 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 
-from generate_accounts_list import generate_accounts_list
-from agency_scraper import AgencyScraper
+from .agency_scraper import AgencyScraper
 
 
 class YesterdayStatsScraper(AgencyScraper):
