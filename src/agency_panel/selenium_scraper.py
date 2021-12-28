@@ -10,6 +10,7 @@ from selenium.webdriver.support import expected_conditions as ec
 
 class SeleniumScraper:
     driver = None
+
     TIMEOUT = 6
     SLEEP_TIME_MIN = 1
     SLEEP_TIME_MAX = 3

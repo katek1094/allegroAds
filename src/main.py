@@ -8,7 +8,7 @@ from UIVision import generate_json_script
 
 # scrape_all_accounts(generate_accounts_list())
 
-# scrape_account('account_name')
+scrape_account('wwwkoomputerypl')
 
 # scrape_best_ids()
 

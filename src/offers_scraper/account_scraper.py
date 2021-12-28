@@ -128,6 +128,5 @@ class AccountScraper:
             except ValueError:
                 offers.append({'id': 0, 'price': 0, 'title': 'error', 'link': 'error'})
                 print('passed offer')
-                pass
         next_page_button = soup.find('a', {'data-role': 'next-page'})
         return offers, next_page_button
