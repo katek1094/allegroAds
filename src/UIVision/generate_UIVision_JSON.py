@@ -32,5 +32,5 @@ def generate_json_script(mode: str, accounts_list: list):
             ])
         commands_array.extend(account_commands_array)
 
-    with open('../../macro.json', 'w', encoding='utf-8') as f:
-        json.dump(commands_array, f)
+    with open('../macro.json', 'w') as f:
+        json.dump(commands_array, f, ensure_ascii=False)

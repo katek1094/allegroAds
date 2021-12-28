@@ -7,7 +7,7 @@ def create_command(command: str, target: str, value: str = "", description: str 
     }
 
 
-def create_click_command(args) -> dict:
+def create_click_command(*args) -> dict:
     return create_command('click', *args)
 
 
