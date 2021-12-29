@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from dotenv import load_dotenv
 
-from .selenium_scraper import SeleniumScraper
+from .selenium_driver import SeleniumDriver
 
 load_dotenv()
 
@@ -12,7 +12,7 @@ AGENCY_EMAIL = os.getenv('AGENCY_EMAIL')
 AGENCY_PASSWORD = os.getenv('AGENCY_PASSWORD')
 
 
-class AgencyScraper(SeleniumScraper):
+class AgencyDriver(SeleniumDriver):
 
     def __init__(self):
         super().__init__('https://ads.allegro.pl/panel/agency/clients')

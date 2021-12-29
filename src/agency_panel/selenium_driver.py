@@ -8,7 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 
 
-class SeleniumScraper:
+class SeleniumDriver:
     driver = None
 
     TIMEOUT = 6
@@ -17,9 +17,9 @@ class SeleniumScraper:
     sleep_mode = False
 
     def __init__(self, url):
-        self.start_driver(url)
+        self.start(url)
 
-    def start_driver(self, url):
+    def start(self, url):
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.driver.get(url)
         self.driver.maximize_window()
@@ -35,3 +35,7 @@ class SeleniumScraper:
         self.sleep()
         self.wait(ec.presence_of_element_located(selector))
         self.driver.find_element(*selector).click()
+
+    @property
+    def page_source(self):
+        return self.driver.page_source
