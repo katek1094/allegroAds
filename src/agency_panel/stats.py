@@ -8,6 +8,16 @@ class Stats(ABC):
     def labels(self):
         pass
 
+    @property
+    @abstractmethod
+    def ads_type(self):
+        pass
+
+    @property
+    @abstractmethod
+    def detail_level(self):
+        pass
+
     def __repr__(self):
         return pformat(vars(self))
 
@@ -22,17 +32,19 @@ class Stats(ABC):
 
 
 class SponsoredStatsMixin:
+    ads_type = 'sponsored'
     labels = ('clicks', 'views', 'CTR', 'avg CPC', 'cost', 'return', 'interest', 'pcs sold ', 'sales value')
-    detail_levels = ('campaigns', 'groups', 'offers')
 
 
 class GraphicStatsMixin:
+    ads_type = 'graphic'
     labels = ('clicks', 'views', 'CTR', 'avg CPM', 'cost', 'return', 'range', 'interest', 'assisted sale', 'pcs sold ',
               'sales value')
-    detail_levels = ('campaigns', 'groups', 'ads')
 
 
 class SponsoredOfferStats(SponsoredStatsMixin, Stats):
+    detail_level = 'offers'
+
     def __init__(self, name: str, id_number: int, campaign_name: str, group_name: str, stats):
         self.name = name
         self.id_number = id_number
@@ -42,6 +54,8 @@ class SponsoredOfferStats(SponsoredStatsMixin, Stats):
 
 
 class SponsoredGroupStats(SponsoredStatsMixin, Stats):
+    detail_level = 'groups'
+
     def __init__(self, name: str, campaign_name: str, stats):
         self.name = name
         self.campaign_name = campaign_name
@@ -49,24 +63,32 @@ class SponsoredGroupStats(SponsoredStatsMixin, Stats):
 
 
 class SponsoredCampaignStats(SponsoredStatsMixin, Stats):
+    detail_level = 'campaigns'
+
     def __init__(self, name: str, stats):
         self.name = name
         self.stats = self.generate_stats_dict(stats)
 
 
 class GraphicAdStats(GraphicStatsMixin, Stats):
+    detail_level = 'ads'
+
     def __init__(self, name: str, stats):
         self.name = name
         self.stats = self.generate_stats_dict(stats)
 
 
 class GraphicGroupStats(GraphicStatsMixin, Stats):
+    detail_level = 'groups'
+
     def __init__(self, name: str, stats):
         self.name = name
         self.stats = self.generate_stats_dict(stats)
 
 
 class GraphicCampaignStats(GraphicStatsMixin, Stats):
+    detail_level = 'campaigns'
+
     def __init__(self, name: str, stats):
         self.name = name
         self.stats = self.generate_stats_dict(stats)

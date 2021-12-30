@@ -8,7 +8,8 @@ from .agency_driver import AgencyDriver
 from .stats import SponsoredOfferStats, SponsoredGroupStats, SponsoredCampaignStats, \
     GraphicAdStats, GraphicGroupStats, GraphicCampaignStats
 
-ads_types = ('sponsored', 'graphic')
+
+allowed_ads_types = ('sponsored', 'graphic')
 
 date_ranges = {
     'yesterday': 'Wczoraj',
@@ -37,8 +38,9 @@ class Requirement:
         self.validate_arguments()
 
     def validate_arguments(self):
-        if self.ads_type not in ads_types:
-            raise ValueError(f'unknown ads type "{self.ads_type}"! please select one from the following: {ads_types}')
+        if self.ads_type not in allowed_ads_types:
+            raise ValueError(
+                f'unknown ads type "{self.ads_type}"! please select one from the following: {allowed_ads_types}')
         if self.date_range not in date_ranges.keys():
             raise ValueError(
                 f'unknown date range "{self.date_range}"! please select one from the following: {date_ranges.keys()}')
@@ -117,7 +119,7 @@ class GenericStatsScraper(ABC):
         for index in range(len(trs)):
             tds = trs[index].findAll('td')
             if self.requirement.detail_level == 'groups':
-                tds = tds[:len(tds) - 1]  # TODO: change it later, deletes last element of groups tds
+                tds = tds[:len(tds) - 1]
             values = []
             for td in tds:
                 value = float(
@@ -271,7 +273,15 @@ class GraphicCampaignsScraper(GraphicScraperMixin, GenericStatsScraper):
         ]
 
 
-def scrape_stats(requirement: Requirement):
-    driver = AgencyDriver()
-    scraper = GraphicCampaignsScraper(driver, requirement)
-    return scraper.scrape_stats()
+def find_scraper(driver: AgencyDriver, requirement: Requirement):
+    scrapers = [
+        SponsoredOffersScraper,
+        SponsoredGroupsScraper,
+        SponsoredCampaignsScraper,
+        GraphicAdsScraper,
+        GraphicGroupsScraper,
+        GraphicCampaignsScraper
+    ]
+    for s in scrapers:
+        if s.stats_class.detail_level == requirement.detail_level and s.stats_class.ads_type == requirement.ads_type:
+            return s(driver, requirement)

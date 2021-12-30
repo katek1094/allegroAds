@@ -1,7 +1,8 @@
-from .oop_stats_scraper import Requirement, scrape_stats
-
-r = Requirement('handlowiec-rs-pl', 'graphic', 'last_week', 'campaigns')
+from .oop_stats_scraper import Requirement, find_scraper, AgencyDriver
 
 
-def xd():
-    print(scrape_stats(r))
+def scrape_stats(requirement: Requirement):
+    driver = AgencyDriver()
+    scraper = find_scraper(driver, requirement)
+
+    return scraper.scrape_stats()
