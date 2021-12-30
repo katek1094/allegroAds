@@ -5,7 +5,8 @@ from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
 
 from .agency_driver import AgencyDriver
-from .stats import SponsoredOfferStats, SponsoredGroupStats, SponsoredCampaignStats
+from .stats import SponsoredOfferStats, SponsoredGroupStats, SponsoredCampaignStats, \
+    GraphicAdStats, GraphicGroupStats, GraphicCampaignStats
 
 ads_types = ('sponsored', 'graphic')
 
@@ -225,19 +226,52 @@ class SponsoredCampaignsScraper(SponsoredScraperMixin, GenericStatsScraper):
         ]
 
 
-class GraphicAdsScraper(GraphicScraperMixin):
-    pass
+class GraphicAdsScraper(GraphicScraperMixin, GenericStatsScraper):
+    stats_class = GraphicAdStats
+    ads_names = []
+
+    def scrape_names_table(self, names_table_body):
+        self.ads_names.extend([span['title'] for span in names_table_body.findAll('span')])
+
+    @property
+    def data_lists(self):
+        return [
+            self.ads_names,
+            self.stats_values
+        ]
 
 
-class GraphicGroupsScraper(GraphicScraperMixin):
-    pass
+class GraphicGroupsScraper(GraphicScraperMixin, GenericStatsScraper):
+    stats_class = GraphicGroupStats
+    groups_names = []
+
+    def scrape_names_table(self, names_table_body):
+        self.groups_names.extend([link['title'] for link in names_table_body.findAll('a')])
+
+    @property
+    def data_lists(self):
+        return [
+            self.groups_names,
+            self.stats_values
+        ]
 
 
-class GraphicCampaignsScraper(GraphicScraperMixin):
-    pass
+class GraphicCampaignsScraper(GraphicScraperMixin, GenericStatsScraper):
+    stats_class = GraphicCampaignStats
+    campaigns_names = []
+
+    def scrape_names_table(self, names_table_body):
+        self.campaigns_names.extend([link['title'] for link in names_table_body.findAll('a')])
+
+    @property
+    def data_lists(self):
+        return [
+            self.campaigns_names,
+            self.stats_values
+        ]
 
 
 def scrape_stats(requirement: Requirement):
     driver = AgencyDriver()
-    scraper = SponsoredCampaignsScraper(driver, requirement)
+    scraper = GraphicCampaignsScraper(driver, requirement)
     return scraper.scrape_stats()

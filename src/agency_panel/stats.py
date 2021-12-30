@@ -55,12 +55,18 @@ class SponsoredCampaignStats(SponsoredStatsMixin, Stats):
 
 
 class GraphicAdStats(GraphicStatsMixin, Stats):
-    pass
+    def __init__(self, name: str, stats):
+        self.name = name
+        self.stats = self.generate_stats_dict(stats)
 
 
 class GraphicGroupStats(GraphicStatsMixin, Stats):
-    pass
+    def __init__(self, name: str, stats):
+        self.name = name
+        self.stats = self.generate_stats_dict(stats)
 
 
 class GraphicCampaignStats(GraphicStatsMixin, Stats):
-    pass
+    def __init__(self, name: str, stats):
+        self.name = name
+        self.stats = self.generate_stats_dict(stats)
