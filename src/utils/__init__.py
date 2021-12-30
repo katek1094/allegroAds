@@ -1,1 +1,1 @@
-from .generate_accounts_list import generate_accounts_list
+from .generate_accounts_list import generate_accounts_list, get_accounts_from_excel

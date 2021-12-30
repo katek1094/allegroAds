@@ -92,3 +92,4 @@ class GraphicCampaignStats(GraphicStatsMixin, Stats):
     def __init__(self, name: str, stats):
         self.name = name
         self.stats = self.generate_stats_dict(stats)
+

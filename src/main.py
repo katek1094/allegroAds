@@ -1,7 +1,7 @@
 from offers_scraper import scrape_account, scrape_all_accounts, scrape_best_ids, scrape_ids_from_url
-from src.utils import generate_accounts_list
+from src.utils import generate_accounts_list, get_accounts_from_excel
 from UIVision import generate_json_script
-from agency_panel import scrape_stats, Requirement
+from agency_panel import Requirement, AgencyDriver, find_scraper, run_budget_checker
 
 # generate_json_script('last_week', generate_accounts_list())
 
@@ -16,7 +16,21 @@ from agency_panel import scrape_stats, Requirement
 # scrape_ids_from_url()
 
 
-r = Requirement('veltini', 'sponsored', 'last_week', 'campaigns')
+# r1 = Requirement('_BRUBECK_', 'sponsored', 'last_month', 'campaigns')
+# r2 = Requirement('art-fotografia', 'sponsored', 'last_week', 'campaigns')
+#
+#
+# # r3 = Requirement('Kaysershop', 'sponsored', 'yesterday', 'offers')
+# # r4 = Requirement('Kaysershop', 'graphic', 'yesterday', 'groups')
+# #
+# #
+# def scrape_stats(requirements):
+#     driver = AgencyDriver()
+#     for r in requirements:
+#         scraper = find_scraper(driver, r)
+#         print(scraper.scrape_stats())
+#
+#
+# scrape_stats([r1, r2])
 
-stats = scrape_stats(r)
-print(stats)
+run_budget_checker(get_accounts_from_excel())

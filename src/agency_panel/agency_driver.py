@@ -13,6 +13,7 @@ AGENCY_PASSWORD = os.getenv('AGENCY_PASSWORD')
 
 
 class AgencyDriver(SeleniumDriver):
+    current_account = None
 
     def __init__(self):
         super().__init__('https://ads.allegro.pl/panel/agency/clients')
@@ -30,3 +31,18 @@ class AgencyDriver(SeleniumDriver):
         self.driver.find_element(By.ID, 'login').send_keys(email)
         self.driver.find_element(By.ID, 'password').send_keys(password)
         self.driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]').click()
+
+    def open_client_and_stats(self, username):
+        self.open_clients_list(username)
+        if self.current_account != username:
+            self.click((By.XPATH, f"//*[text()='{username}']"))
+            self.click((By.LINK_TEXT, 'Statystyki'))
+            self.current_account = username
+
+    def open_clients_list(self, username):
+        if not self.current_account:
+            return
+        elif self.current_account == username:
+            return
+        else:
+            self.click((By.LINK_TEXT, self.current_account))
