@@ -1,6 +1,6 @@
 from .oop_stats_scraper import Requirement, scrape_stats
 
-r = Requirement('wwwkoomputerypl', 'sponsored', 'last_week', 'offers')
+r = Requirement('starhousegames', 'sponsored', 'last_week', 'campaigns')
 
 
 def xd():

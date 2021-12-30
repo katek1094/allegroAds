@@ -5,11 +5,7 @@ from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
 
 from .agency_driver import AgencyDriver
-from .stats import SponsoredOfferStats
-
-sponsored_labels = ['clicks', 'views', 'CTR', 'avg CPC', 'cost', 'return', 'interest', 'pcs sold ', 'sales value']
-graphic_labels = ['clicks', 'views', 'CTR', 'avg CPM', 'cost', 'return', 'range', 'interest', 'assisted sale',
-                  'pcs sold ', 'sales value']
+from .stats import SponsoredOfferStats, SponsoredGroupStats, SponsoredCampaignStats
 
 ads_types = ('sponsored', 'graphic')
 
@@ -55,6 +51,8 @@ class Requirement:
 
 
 class GenericStatsScraper(ABC):
+    stats_values = []
+
     def __init__(self, driver: AgencyDriver, requirement: Requirement):
         super().__init__()
 
@@ -95,37 +93,69 @@ class GenericStatsScraper(ABC):
         elif detail_level == 'offers' or detail_level == 'ads':
             self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[3]/div[1]/div/div[3]/button'))
 
-    def scrape_data_from_page(self, index=1):
+    def scrape_data_from_page(self):
         self.driver.sleep(.1)  # without sleep time amount of scraped offers is smaller - probably due to loading
         soup = BeautifulSoup(self.driver.page_source, 'html5lib')
+        names_table_body = soup.findAll("table")[0].find('tbody')
 
-        self.scrape_names_table(soup)
-        self.scrape_values_table(soup, index == 1)
+        self.scrape_names_table(names_table_body)
+        self.scrape_values_table(soup)
 
         is_next_page = soup.find('span', text='następna')
         if is_next_page:
             try:
                 self.driver.click((By.CSS_SELECTOR, 'button[aria-label="następna strona"]'))
-                self.scrape_data_from_page(index + 1)
+                self.scrape_data_from_page()
             except ElementNotInteractableException:  # button is always in html, but hidden and disabled
                 pass
 
-    @abstractmethod
-    def scrape_names_table(self, soup):
-        pass
+    def scrape_values_table(self, soup):
+        values_table_body = soup.findAll("table")[1].find('tbody')
+        trs = values_table_body.findAll('tr')[1:]
+
+        for index in range(len(trs)):
+            tds = trs[index].findAll('td')
+            if self.requirement.detail_level == 'groups':
+                tds = tds[:len(tds) - 1]  # TODO: change it later, deletes last element of groups tds
+            values = []
+            for td in tds:
+                value = float(
+                    td.text.replace(" ", "").replace("%", "").replace("zł", "").replace(",", ".").replace('-', '0'))
+                values.append(value)
+            self.stats_values.append(tuple(values))
 
     @abstractmethod
-    def scrape_values_table(self, soup, is_first_page):
+    def scrape_names_table(self, names_table_body):
         pass
 
-    @abstractmethod
     def formatted_data(self):
+        data_len = self.check_data_len()
+        stats = []
+        for idx in range(data_len):
+            args = tuple(data_list[idx] for data_list in self.data_lists)
+            stats.append(self.stats_class(*args))
+        return stats
+
+    @property
+    @abstractmethod
+    def stats_class(self):
+        pass
+
+    def check_data_len(self):
+        for x in self.data_lists:
+            print(len(x))
+        if not len({len(i) for i in self.data_lists}) == 1:
+            raise ValueError('data lists are not equal length!')
+        return len(self.stats_values)
+
+    @property
+    @abstractmethod
+    def data_lists(self):
         pass
 
 
 class SponsoredScraperMixin:
     driver: AgencyDriver
-    stats_values = []
 
     def set_ads_type(self):
         pass
@@ -139,62 +169,60 @@ class GraphicScraperMixin:
 
 
 class SponsoredOffersScraper(SponsoredScraperMixin, GenericStatsScraper):
+    stats_class = SponsoredOfferStats
     offers_names = []
     groups_names = []
     campaigns_names = []
     offers_ids = []
 
-    def scrape_names_table(self, soup):
-        names_table_body = soup.findAll("table")[0].find('tbody')
+    def scrape_names_table(self, names_table_body):
         self.offers_names.extend([link.text for link in names_table_body.findAll('a')[::3]])
         self.groups_names.extend([link['title'] for link in names_table_body.findAll('a')[2::3]])
         self.campaigns_names.extend([link['title'] for link in names_table_body.findAll('a')[1::3]])
         self.offers_ids.extend([link['href'].split('/')[-1] for link in names_table_body.findAll('a')[::3]])
 
-    def scrape_values_table(self, soup, is_first_page):
-        values_table_body = soup.findAll("table")[1].find('tbody')
-        trs = values_table_body.findAll('tr')
-        if is_first_page:
-            trs = trs[1:]  # first row is summary stats
-
-        for index in range(len(trs)):
-            tds = trs[index].findAll('td')
-            values = []
-            for td in tds:
-                value = float(
-                    td.text.replace(" ", "").replace("%", "").replace("zł", "").replace(",", ".").replace('-', '0'))
-                values.append(value)
-            self.stats_values.append(tuple(values))
-
-    def formatted_data(self):
-        self.check_data()
-        stats = []
-        for idx in range(len(self.offers_names)):
-            args = (self.offers_names[idx],
-                    self.offers_ids[idx],
-                    self.campaigns_names[idx],
-                    self.groups_names[idx],
-                    self.stats_values[idx])
-            stats.append(SponsoredOfferStats(*args))
-        return stats
-
-    def check_data(self):
-        lists = [
+    @property
+    def data_lists(self):
+        return [
             self.offers_names,
             self.groups_names,
             self.campaigns_names,
             self.offers_ids,
             self.stats_values
         ]
-        return len({len(i) for i in lists}) == 1
 
 
-class SponsoredGroupsScraper(SponsoredScraperMixin):
-    pass
+class SponsoredGroupsScraper(SponsoredScraperMixin, GenericStatsScraper):
+    stats_class = SponsoredGroupStats
+    groups_names = []
+    campaigns_names = []
+
+    def scrape_names_table(self, names_table_body):
+        self.groups_names.extend([link.text for link in names_table_body.findAll('a')[::2]])
+        self.campaigns_names.extend([link['title'] for link in names_table_body.findAll('a')[1::2]])
+
+    @property
+    def data_lists(self):
+        return [
+            self.groups_names,
+            self.campaigns_names,
+            self.stats_values
+        ]
 
 
-class SponsoredCampaignsScraper(SponsoredScraperMixin):
-    pass
+class SponsoredCampaignsScraper(SponsoredScraperMixin, GenericStatsScraper):
+    stats_class = SponsoredCampaignStats
+    campaigns_names = []
+
+    def scrape_names_table(self, names_table_body):
+        self.campaigns_names.extend([link['title'] for link in names_table_body.findAll('a')])
+
+    @property
+    def data_lists(self):
+        return [
+            self.campaigns_names,
+            self.stats_values
+        ]
 
 
 class GraphicAdsScraper(GraphicScraperMixin):
@@ -211,5 +239,5 @@ class GraphicCampaignsScraper(GraphicScraperMixin):
 
 def scrape_stats(requirement: Requirement):
     driver = AgencyDriver()
-    scraper = SponsoredOffersScraper(driver, requirement)
+    scraper = SponsoredCampaignsScraper(driver, requirement)
     return scraper.scrape_stats()
