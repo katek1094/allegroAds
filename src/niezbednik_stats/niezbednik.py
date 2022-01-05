@@ -59,14 +59,15 @@ def format_account_data(data):
 def create_excel(data):
     wb = Workbook()
     ws = wb.active
-    row = 2
-    col = 1
+    row = 1
+    col = 2
 
     start_date = datetime.date.today()
     day_count = 30
-    for date in (start_date - datetime.timedelta(n + 1) for n in range(day_count)):
-        ws.cell(row=row, column=col).value = date.strftime('%d-%m-%Y')
+    for date in (start_date - datetime.timedelta(day_count - n) for n in range(day_count)):
+        ws.cell(row=row, column=col).value = date.strftime('%d-%m')
         col += 1
+    row += 1
     col = 1
     for id_number, records in data:
         ws.cell(row=row, column=col).value = id_number
