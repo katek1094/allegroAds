@@ -4,7 +4,8 @@ from .commands import Commands
 
 possible_modes = (
     'campaigns',
-    'last_week'
+    'last_week',
+    'last_month'
 )
 
 
@@ -30,6 +31,14 @@ def generate_json_script(mode: str, accounts_list: list):
                 commands.select_last_week,
                 commands.update,
             ])
+        if mode == possible_modes[2]:
+            account_commands_array.extend([
+                commands.open_stats,
+                commands.open_calendar,
+                commands.select_last_month,
+                commands.update,
+            ])
+
         commands_array.extend(account_commands_array)
 
     with open('../macro.json', 'w') as f:

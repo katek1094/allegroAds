@@ -17,7 +17,9 @@ class Commands:
                                                 'https://ads.allegro.pl/panel/agency/clients')
         self.open_clients_list = create_click_command('linkText=Przełącz na klienta')
         self.open_client_account = create_click_command(f"xpath=(//*[text()='{account_name}']) ")
-        self.open_stats = create_click_command('linkText=linkText=Statystyki')
+        # self.open_stats = create_click_command('linkText=linkText=Statystyki')
+        self.open_stats = create_click_command(
+            'xpath=//*[@id="main"]/div[2]/div/header/div/div/div[2]/div/div/div/div/div[1]/nav/a[2]')
         self.open_calendar = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div/div[2]/div')
 
         # calendar range options

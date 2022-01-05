@@ -1,9 +1,9 @@
 from offers_scraper import scrape_account, scrape_all_accounts, scrape_best_ids, scrape_ids_from_url
 from src.utils import generate_accounts_list, get_accounts_from_excel
 from UIVision import generate_json_script
-from agency_panel import Requirement, AgencyDriver, find_scraper, run_budget_checker
+from agency_panel import Requirement, AgencyDriver, find_scraper, run_budget_checker, BudgetCheckerModeChoices
 
-# generate_json_script('last_week', generate_accounts_list())
+# generate_json_script('last_month', generate_accounts_list())
 
 # generate_json_script('campaigns', generate_accounts_list())
 
@@ -33,4 +33,4 @@ from agency_panel import Requirement, AgencyDriver, find_scraper, run_budget_che
 #
 # scrape_stats([r1, r2])
 
-run_budget_checker(get_accounts_from_excel())
+run_budget_checker(get_accounts_from_excel(), BudgetCheckerModeChoices.current_billing_month)
