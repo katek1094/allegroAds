@@ -34,16 +34,12 @@ def login(s):
 
 def get_account_raw_data(s: requests.Session, account_name):
     api_url = 'https://niezbedniksprzedawcy.pl/StatystykiAllegro/get_offers_stats?format=json'
-    """
-    params
-    q - account_name
-    p - page number
-    l - 
-    f - 1M, 2M, 3M, 1y
-    offerPositionLimit - 
-    """
-    #     'https://niezbedniksprzedawcy.pl/StatystykiAllegro/get_offers_stats?format=json&q=handlowiec-rs-pl&p=1&l=10&f=1M&offerPositionLimit=600')
-    r = s.get(api_url, params={'q': account_name, 'p': 1, 'l': 600, 'f': '1M', 'offerPositionLimit': 600})
+    params = {'q': account_name,
+              'p': 1,  # pagination control
+              'l': 600,  # amount of data on one page
+              'f': '1M',  # time range of data requested
+              'offerPositionLimit': 600}  # minimum position in accuracy ranking for offer to show; max=600
+    r = s.get(api_url, params=params)
     return r.json()
 
 
@@ -95,10 +91,13 @@ def create_excel(data: [OfferData]):
     wb.save('/home/kajetan/Desktop/handlowiec-rs-pl.xlsx')
 
 
+def create_account_stats_report(s, account_name):
+    raw_data = get_account_raw_data(s, account_name)
+    results = format_account_data(raw_data)
+    create_excel(results)
+
+
 s = create_session()
 login(s)
-raw_data = get_account_raw_data(s, 'handlowiec-rs-pl')
-results = format_account_data(raw_data)
-create_excel(results)
 
-# print(datetime.datetime.fromtimestamp(1639004400).strftime("%A, %B %d, %Y %I:%M:%S"))
+create_account_stats_report(s, 'handlowiec-rs-pl')
