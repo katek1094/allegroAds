@@ -8,7 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class AccountScraper:
-    min_sleep_time = 2
+    min_sleep_time = 1
     max_sleep_time = 3
     allegro_url = 'https://allegro.pl'
     max_level = 0
@@ -45,10 +45,16 @@ class AccountScraper:
         time.sleep(random.randrange(self.min_sleep_time, self.max_sleep_time))  # to avoid allegro captcha ban
 
     def scrape_offers_amount(self):
-        soup = BeautifulSoup(self.driver.page_source, 'html5lib')
-        user_info = soup.find('div', {'data-box-name': 'user info'})
-        amount = int(user_info.find('span', {'data-role': 'counter-value'}).text.replace(' ', ''))
-        self.offers_amount = amount
+        try:
+            soup = BeautifulSoup(self.driver.page_source, 'html5lib')
+            user_info = soup.find('div', {'data-box-name': 'user info'})
+            amount = int(user_info.find('span', {'data-role': 'counter-value'}).text.replace(' ', ''))
+            self.offers_amount = amount
+        except AttributeError:
+            print('DRIVER CLOSED')
+            self.driver.close()
+            self.start_driver()
+            self.scrape_offers_amount()
 
     def scrape_main_categories(self):
         subs, offers = self.scrape_subcategories(self.driver.page_source)
