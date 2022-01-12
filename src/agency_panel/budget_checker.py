@@ -41,7 +41,7 @@ def run_budget_checker(accounts, mode):
             if 31 >= today.day >= 26:
                 is_overspend = (((today.day - 25) / 30) * account.monthly_budget) < costs
             else:
-                is_overspend = ((today.day / 30) * account.monthly_budget) < costs
+                is_overspend = (((today.day + 4) / 30) * account.monthly_budget) < costs
 
         else:
             raise ValueError('budget checker choice not implemented')
