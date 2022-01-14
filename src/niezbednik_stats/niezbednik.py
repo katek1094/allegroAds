@@ -72,6 +72,36 @@ def generate_columns_for_dates_dict():
 columns_for_dates = generate_columns_for_dates_dict()
 
 
+def get_point_for_day_data(arr):
+    points = 0
+    for dt in arr:
+        if dt == 1:
+            points += 14
+        elif 4 > dt > 1:
+            points += 8
+        elif 6 > dt > 3:
+            points += 5
+        elif 9 > dt > 5:
+            points += 3.5
+        elif 13 > dt > 8:
+            points += 2.5
+        elif 21 > dt > 12:
+            points += 2
+        elif 41 > dt > 20:
+            points += 1
+        elif 61 > dt > 40:
+            points += 0.8
+        elif 121 > dt > 60:
+            points += 0.4
+        elif 181 > dt > 120:
+            points += 0.2
+        elif 601 > dt > 180:
+            points += 0.1
+        else:
+            raise Exception('wrong value or code "if" ranges')
+    return round(points, 2)
+
+
 def create_excel(data: [OfferData]):
     wb = Workbook()
     ws = wb.active
@@ -88,6 +118,32 @@ def create_excel(data: [OfferData]):
             ws.cell(row=row, column=columns_for_dates[record.date]).value = record.value
         row += 1
 
+    # reformat data into days of records
+    days = []
+    for _ in range(30):
+        days.append([])
+    for offer_data in data:
+        for index, record in enumerate(offer_data.records):
+            days[columns_for_dates[record.date] - 2].append(record.value)
+
+    points = []
+    for day in days:
+        points.append(get_point_for_day_data(day))
+
+    ws = wb.create_sheet('stats')
+    for date, column in columns_for_dates.items():
+        ws.cell(row=1, column=column).value = date.strftime('%d-%m')
+    for col, point in enumerate(points):
+        ws.cell(row=2, column=col + 2).value = point
+
+    # # WRITE NEW DATA IN NEW SHEET
+    # ws = wb.create_sheet('stats')
+    # for date, column in columns_for_dates.items():
+    #     ws.cell(row=1, column=column).value = date.strftime('%d-%m')
+    #
+    # for col, day in enumerate(days):
+    #     for row, dt in enumerate(day):
+    #         ws.cell(row=row+2, column=col+2).value = dt
 
     wb.save('/home/kajetan/Desktop/handlowiec-rs-pl.xlsx')
 
