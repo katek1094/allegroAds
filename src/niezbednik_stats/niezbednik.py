@@ -1,10 +1,10 @@
-import os
-import requests
 import datetime
+import os
 from collections import namedtuple
 
-from dotenv import load_dotenv
+import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 from openpyxl import Workbook
 
 
@@ -87,6 +87,7 @@ def create_excel(data: [OfferData]):
         for record in offer_data.records:
             ws.cell(row=row, column=columns_for_dates[record.date]).value = record.value
         row += 1
+
 
     wb.save('/home/kajetan/Desktop/handlowiec-rs-pl.xlsx')
 

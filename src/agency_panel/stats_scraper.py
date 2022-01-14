@@ -136,21 +136,7 @@ class GenericStatsScraper(ABC):
         pass
 
 
-class SponsoredScraperMixin:
-    driver: AgencyDriver
-
-    # def set_ads_type(self):
-    #     self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[1]'))
-
-
-class GraphicScraperMixin:
-    driver: AgencyDriver
-
-    # def set_ads_type(self):
-    #     self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[2]'))
-
-
-class SponsoredOffersScraper(SponsoredScraperMixin, GenericStatsScraper):
+class SponsoredOffersScraper(GenericStatsScraper):
     stats_class = SponsoredOfferStats
 
     def __init__(self, *args):
@@ -164,7 +150,7 @@ class SponsoredOffersScraper(SponsoredScraperMixin, GenericStatsScraper):
         self.offers_names.extend([link.text for link in names_table_body.findAll('a')[::3]])
         self.groups_names.extend([link['title'] for link in names_table_body.findAll('a')[2::3]])
         self.campaigns_names.extend([link['title'] for link in names_table_body.findAll('a')[1::3]])
-        self.offers_ids.extend([link['href'].split('/')[-1] for link in names_table_body.findAll('a')[::3]])
+        self.offers_ids.extend([int(link['href'].split('/')[-1]) for link in names_table_body.findAll('a')[::3]])
 
     @property
     def data_lists(self):
@@ -177,7 +163,7 @@ class SponsoredOffersScraper(SponsoredScraperMixin, GenericStatsScraper):
         ]
 
 
-class SponsoredGroupsScraper(SponsoredScraperMixin, GenericStatsScraper):
+class SponsoredGroupsScraper(GenericStatsScraper):
     stats_class = SponsoredGroupStats
 
     def __init__(self, *args):
@@ -198,7 +184,7 @@ class SponsoredGroupsScraper(SponsoredScraperMixin, GenericStatsScraper):
         ]
 
 
-class SponsoredCampaignsScraper(SponsoredScraperMixin, GenericStatsScraper):
+class SponsoredCampaignsScraper(GenericStatsScraper):
     stats_class = SponsoredCampaignStats
 
     def __init__(self, *args):
@@ -216,7 +202,7 @@ class SponsoredCampaignsScraper(SponsoredScraperMixin, GenericStatsScraper):
         ]
 
 
-class GraphicAdsScraper(GraphicScraperMixin, GenericStatsScraper):
+class GraphicAdsScraper(GenericStatsScraper):
     stats_class = GraphicAdStats
 
     def __init__(self, *args):
@@ -234,7 +220,7 @@ class GraphicAdsScraper(GraphicScraperMixin, GenericStatsScraper):
         ]
 
 
-class GraphicGroupsScraper(GraphicScraperMixin, GenericStatsScraper):
+class GraphicGroupsScraper(GenericStatsScraper):
     stats_class = GraphicGroupStats
 
     def __init__(self, *args):
@@ -252,7 +238,7 @@ class GraphicGroupsScraper(GraphicScraperMixin, GenericStatsScraper):
         ]
 
 
-class GraphicCampaignsScraper(GraphicScraperMixin, GenericStatsScraper):
+class GraphicCampaignsScraper(GenericStatsScraper):
     stats_class = GraphicCampaignStats
 
     def __init__(self, *args):
