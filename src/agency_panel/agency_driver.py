@@ -1,9 +1,10 @@
 import os
 
+from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
-from dotenv import load_dotenv
 
+from .constants import date_ranges, ads_types, detail_levels
 from .selenium_driver import SeleniumDriver
 
 load_dotenv()
@@ -36,8 +37,20 @@ class AgencyDriver(SeleniumDriver):
         self.open_clients_list(username)
         if self.current_account != username:
             self.click((By.XPATH, f"//*[text()='{username}']"))
-            self.click((By.LINK_TEXT, 'Statystyki'))
+            self.open_stats()
             self.current_account = username
+
+    def open_client(self, username):
+        self.open_clients_list(username)
+        if self.current_account != username:
+            self.click((By.XPATH, f"//*[text()='{username}']"))
+            self.current_account = username
+
+    def open_stats(self):
+        self.click((By.LINK_TEXT, 'Statystyki'))
+
+    def open_my_files(self):
+        self.click((By.XPATH, '//*[@id="main"]/div[2]/div/header/div/div/div[2]/div/div/div/div/div[1]/nav/div/a'))
 
     def open_clients_list(self, username):
         if not self.current_account:
@@ -46,3 +59,26 @@ class AgencyDriver(SeleniumDriver):
             return
         else:
             self.click((By.LINK_TEXT, self.current_account))
+
+    def set_ads_type(self, ads_type):
+        if ads_type not in ads_types:
+            raise ValueError('wrong ads type!')
+        if ads_type == 'sponsored':
+            self.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[1]'))
+        elif ads_type == 'graphic':
+            self.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[2]'))
+
+    def set_date_range(self, date_range):
+        if date_range not in date_ranges.keys():
+            raise ValueError('wrong date range')
+        self.click((By.CSS_SELECTOR, 'div[title="Zmień zakres dat"]'))
+        self.click((By.XPATH, f"//*[text()='{date_ranges[date_range]}']"))
+        self.click((By.XPATH, "//*[text()='Aktualizuj']"))
+
+    def set_detail_level(self, detail_level):
+        if detail_level not in detail_levels:
+            raise ValueError('wrong detail level')
+        if detail_level == 'groups':
+            self.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[3]/div[1]/div/div[2]/button'))
+        elif detail_level == 'offers' or detail_level == 'ads':
+            self.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[3]/div[1]/div/div[3]/button'))

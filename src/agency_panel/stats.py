@@ -1,5 +1,5 @@
-from pprint import pformat
 from abc import ABC, abstractmethod
+from pprint import pformat
 
 
 class Stats(ABC):

@@ -1,5 +1,5 @@
 from offers_scraper import scrape_account, scrape_all_accounts, scrape_best_ids, scrape_ids_from_url
-from src.utils import generate_accounts_list, get_accounts_from_excel
+from src.utils import accounts, get_accounts_from_excel
 from UIVision import generate_json_script
 from agency_panel import Requirement, AgencyDriver, find_scraper, run_budget_checker, BudgetCheckerModeChoices
 

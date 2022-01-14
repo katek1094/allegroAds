@@ -1,25 +1,13 @@
 from abc import ABC, abstractmethod
 
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import ElementNotInteractableException
 from bs4 import BeautifulSoup
+from selenium.common.exceptions import ElementNotInteractableException
+from selenium.webdriver.common.by import By
 
+from src.agency_panel.constants import ads_types, date_ranges, detail_levels
 from .agency_driver import AgencyDriver
 from .stats import SponsoredOfferStats, SponsoredGroupStats, SponsoredCampaignStats, \
     GraphicAdStats, GraphicGroupStats, GraphicCampaignStats
-
-allowed_ads_types = ('sponsored', 'graphic')
-
-date_ranges = {
-    'yesterday': 'Wczoraj',
-    'today': 'Dzisiaj',
-    'last_week': 'Ostatnie 7 dni',
-    'last_month': 'Ostatnie 30 dni',
-    'last_billing_month': 'Poprzedni okres rozliczeniowy',
-    'current_billing_month': 'Bieżący okres rozliczeniowy',
-}
-
-detail_levels = ('campaigns', 'groups', 'offers', 'ads')
 
 
 class Requirement:
@@ -37,9 +25,9 @@ class Requirement:
         self.validate_arguments()
 
     def validate_arguments(self):
-        if self.ads_type not in allowed_ads_types:
+        if self.ads_type not in ads_types:
             raise ValueError(
-                f'unknown ads type "{self.ads_type}"! please select one from the following: {allowed_ads_types}')
+                f'unknown ads type "{self.ads_type}"! please select one from the following: {ads_types}')
         if self.date_range not in date_ranges.keys():
             raise ValueError(
                 f'unknown date range "{self.date_range}"! please select one from the following: {date_ranges.keys()}')
@@ -63,30 +51,16 @@ class GenericStatsScraper(ABC):
         self.requirement = requirement
 
     def scrape_stats(self):
-        self.driver.open_client_and_stats(self.requirement.username)
-        self.set_ads_type()
-        self.set_date_range()
-        self.set_detail_level()
-
+        self.set_stats_for_requirement(self.requirement)
         self.scrape_data_from_page()
 
         return self.formatted_data()
 
-    @abstractmethod
-    def set_ads_type(self):
-        pass
-
-    def set_date_range(self):
-        self.driver.click((By.CSS_SELECTOR, 'div[title="Zmień zakres dat"]'))
-        self.driver.click((By.XPATH, f"//*[text()='{date_ranges[self.requirement.date_range]}']"))
-        self.driver.click((By.XPATH, "//*[text()='Aktualizuj']"))
-
-    def set_detail_level(self):
-        detail_level = self.requirement.detail_level
-        if detail_level == 'groups':
-            self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[3]/div[1]/div/div[2]/button'))
-        elif detail_level == 'offers' or detail_level == 'ads':
-            self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[3]/div[1]/div/div[3]/button'))
+    def set_stats_for_requirement(self, r: Requirement):
+        self.driver.open_client_and_stats(r.username)
+        self.driver.set_ads_type(r.ads_type)
+        self.driver.set_date_range(r.date_range)
+        self.driver.set_detail_level(r.detail_level)
 
     def scrape_data_from_page(self):
         self.driver.sleep(.15)  # without sleep time amount of scraped offers is smaller - probably due to loading
@@ -165,15 +139,15 @@ class GenericStatsScraper(ABC):
 class SponsoredScraperMixin:
     driver: AgencyDriver
 
-    def set_ads_type(self):
-        self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[1]'))
+    # def set_ads_type(self):
+    #     self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[1]'))
 
 
 class GraphicScraperMixin:
     driver: AgencyDriver
 
-    def set_ads_type(self):
-        self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[2]'))
+    # def set_ads_type(self):
+    #     self.driver.click((By.XPATH, '//*[@id="layoutBody"]/div/div/div[1]/div[1]/div/div/a[2]'))
 
 
 class SponsoredOffersScraper(SponsoredScraperMixin, GenericStatsScraper):
@@ -196,9 +170,9 @@ class SponsoredOffersScraper(SponsoredScraperMixin, GenericStatsScraper):
     def data_lists(self):
         return [
             self.offers_names,
-            self.groups_names,
-            self.campaigns_names,
             self.offers_ids,
+            self.campaigns_names,
+            self.groups_names,
             self.stats_values
         ]
 
