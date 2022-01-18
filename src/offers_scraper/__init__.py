@@ -5,7 +5,7 @@ from .ids_scrapers import BestOffersScraper, UrlIdsScraper
 
 def scrape_account(username: str):
     scraper = AccountScraper(username)
-    ExcelWriter(username, scraper.categories)
+    ExcelWriter(username, scraper.categories, scraper.max_level)
 
 
 def scrape_all_accounts(accounts_names: iter):

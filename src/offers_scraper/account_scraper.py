@@ -6,20 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-
-class Offer:
-    def __init__(self, *, id_number: int, price: float, title: str, link: str):
-        self.id_number = id_number
-        self.price = price
-        self.title = title
-        self.link = link
-
-
-class Category:
-    def __init__(self, name: str, url: str, offers_amount: int):
-        self.name = name
-        self.url = url
-        self.offers_amount = offers_amount
+from .data_types import Offer, Category
 
 
 class AccountScraper:
@@ -27,8 +14,7 @@ class AccountScraper:
     MAX_SLEEP_TIME = 3
     ALLEGRO_URL = 'https://allegro.pl'
 
-    offers_amount: int
-    categories: dict
+    categories: [Category]
 
     def __init__(self, username: str):
         self.ids = set()
@@ -37,24 +23,25 @@ class AccountScraper:
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.driver.minimize_window()
 
-        self.driver.get(self.ALLEGRO_URL + '/uzytkownik/' + username)
         print(f'scraping started on account {username}')
-        self.offers_amount = self.scrape_offers_amount()
-        self.categories = self.scrape_main_categories()
-        print(self.categories)
-        self.categories['subs'], self.categories['offers'] = self.scrape_subcategories_tree(self.categories['subs'], 1)
-        self.categories['max_level'] = self.max_level
+
+        self.categories = [Category(name="Wszystkie oferty", url=self.ALLEGRO_URL + '/uzytkownik/' + username,
+                                    offers_amount=self.scrape_offers_amount(username), subcategories=[], offers=[],
+                                    level=0)]
+
+        _, _ = self.scrape_subcategories_tree(self.categories, 0)
+
         self.driver.close()
         print(f'scraping finished on account {username}')
 
-    def update_ids(self, id_number):
+    def update_ids(self, id_number: int):
         len_before = len(self.ids)
         self.ids.add(id_number)
         len_after = len(self.ids)
         first = '' if len_after == 1 else '\r'
-        end = '\n' if len_after == self.offers_amount else ''
+        end = '\n' if len_after == self.categories[0].offers_amount else ''
         if len_after != len_before:
-            print(first, f"scraped {len_after}/{self.offers_amount} offers", sep='', end=end)
+            print(first, f"scraped {len_after}/{self.categories[0].offers_amount} offers", sep='', end=end)
 
     def start_driver(self):
         # noinspection PyArgumentList
@@ -64,7 +51,8 @@ class AccountScraper:
     def sleep_time(self):
         time.sleep(random.randrange(self.MIN_SLEEP_TIME, self.MAX_SLEEP_TIME))  # to avoid allegro captcha ban
 
-    def scrape_offers_amount(self) -> int:
+    def scrape_offers_amount(self, username) -> int:
+        self.driver.get(self.ALLEGRO_URL + '/uzytkownik/' + username)
         attempts = 0
         while attempts < 3:
             try:
@@ -79,11 +67,32 @@ class AccountScraper:
                 self.start_driver()
                 continue
 
-    def scrape_main_categories(self) -> dict:
-        subs, offers = self.scrape_subcategories(self.driver.page_source)
-        return {'subs': subs, 'offers': offers}
+    def scrape_subcategories_tree(self, categories: [Category], level):
+        if level > self.max_level:
+            self.max_level = level
+        offers = []
+        for category in categories:
+            attempts = 0
+            while attempts < 3:
+                try:
+                    self.driver.get(category.url)
+                    self.sleep_time()
+                    category.subcategories, category.offers = self.scrape_subcategories(self.driver.page_source,
+                                                                                        level + 1)
+                    if len(category.subcategories):
+                        category.subcategories, category.offers = self.scrape_subcategories_tree(category.subcategories,
+                                                                                                 level + 1)
+                except AttributeError:
+                    print('DRIVER CLOSED')
+                    attempts += 1
+                    self.driver.close()
+                    self.start_driver()
+                    continue
+                break
+            offers += category.offers
+        return categories, offers
 
-    def scrape_subcategories(self, page_source: str):
+    def scrape_subcategories(self, page_source: str, level: int):
         """
         scrapes categories and offers (if there is not more nested categories) from a given page
         """
@@ -97,35 +106,11 @@ class AccountScraper:
                 break
             else:  # scrape subcategories
                 name = tag.div.a.text.strip()
-                href = tag.div.a['href']
+                href = self.ALLEGRO_URL + tag.div.a['href']
                 amount = int(tag.div.span.text)
-                subcategories.append({'name': name, 'href': href, 'amount': amount})
+                subcategories.append(
+                    Category(name=name, url=href, offers_amount=amount, subcategories=[], offers=[], level=level))
         return subcategories, offers
-
-    def scrape_subcategories_tree(self, categories, level):
-        if level > self.max_level:
-            self.max_level = level
-        subs = categories
-        offers = []
-        for category in categories:
-            attempts = 0
-            while attempts < 3:
-                try:
-                    self.driver.get(self.ALLEGRO_URL + category['href'])
-                    self.sleep_time()
-                    category['subs'], category['offers'] = self.scrape_subcategories(self.driver.page_source)
-                    if len(category['subs']):
-                        category['subs'], category['offers'] = self.scrape_subcategories_tree(category['subs'],
-                                                                                              level + 1)
-                except AttributeError:
-                    print('DRIVER CLOSED')
-                    attempts += 1
-                    self.driver.close()
-                    self.start_driver()
-                    continue
-                break
-            offers += category['offers']
-        return subs, offers
 
     def scrape_subcategory_offers(self, page_source):
         offers = []
