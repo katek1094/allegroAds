@@ -32,8 +32,10 @@ class SeleniumDriver:
         if self.sleep_mode or duration:
             time.sleep(random.randrange(self.SLEEP_TIME_MIN, self.SLEEP_TIME_MAX))
 
-    def wait(self, element):
-        WebDriverWait(self.driver, self.TIMEOUT).until(element)
+    def wait(self, element, timeout=None):
+        if not timeout:
+            timeout = self.TIMEOUT
+        WebDriverWait(self.driver, timeout).until(element)
 
     def click(self, selector):
         self.sleep()

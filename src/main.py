@@ -1,10 +1,16 @@
+from offers_scraper import scrape_account
+from agency_panel import scrape_planner
+
+
+scrape_planner('makrama')
+
 # generate_json_script('last_month', generate_accounts_list())
 
 # generate_json_script('campaigns', generate_accounts_list())
 
 # scrape_all_accounts(generate_accounts_list())
 
-# scrape_account('wwwkoomputerypl')
+# scrape_account('misumi24')
 
 # scrape_best_ids()
 
