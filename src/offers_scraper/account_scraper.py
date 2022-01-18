@@ -7,22 +7,40 @@ from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 
-class AccountScraper:
-    min_sleep_time = 1
-    max_sleep_time = 3
-    allegro_url = 'https://allegro.pl'
-    max_level = 0
-    offers_amount = 0
-    driver = None
+class Offer:
+    def __init__(self, id_number: int, price: float, title: str, link: str):
+        self.id_number = id_number
+        self.price = price
+        self.title = title
+        self.link = link
 
-    def __init__(self, username):
-        self.categories = {}
+
+class Category:
+    def __init__(self, name: str, url: str, offers_amount: int):
+        self.name = name
+        self.url = url
+        self.offers_amount = offers_amount
+
+
+class AccountScraper:
+    MIN_SLEEP_TIME = 1
+    MAX_SLEEP_TIME = 3
+    ALLEGRO_URL = 'https://allegro.pl'
+
+    offers_amount: int
+    categories: dict
+
+    def __init__(self, username: str):
         self.ids = set()
-        self.start_driver()
-        self.driver.get(self.allegro_url + '/uzytkownik/' + username)
+        self.max_level = 0
+        # noinspection PyArgumentList
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        self.driver.minimize_window()
+
+        self.driver.get(self.ALLEGRO_URL + '/uzytkownik/' + username)
         print(f'scraping started on account {username}')
-        self.scrape_offers_amount()
-        self.scrape_main_categories()
+        self.offers_amount = self.scrape_offers_amount()
+        self.categories = self.scrape_main_categories()
         self.categories['subs'], self.categories['offers'] = self.scrape_subcategories_tree(self.categories['subs'], 1)
         self.categories['max_level'] = self.max_level
         self.driver.close()
@@ -38,27 +56,31 @@ class AccountScraper:
             print(first, f"scraped {len_after}/{self.offers_amount} offers", sep='', end=end)
 
     def start_driver(self):
+        # noinspection PyArgumentList
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.driver.minimize_window()
 
     def sleep_time(self):
-        time.sleep(random.randrange(self.min_sleep_time, self.max_sleep_time))  # to avoid allegro captcha ban
+        time.sleep(random.randrange(self.MIN_SLEEP_TIME, self.MAX_SLEEP_TIME))  # to avoid allegro captcha ban
 
-    def scrape_offers_amount(self):
-        try:
-            soup = BeautifulSoup(self.driver.page_source, 'html5lib')
-            user_info = soup.find('div', {'data-box-name': 'user info'})
-            amount = int(user_info.find('span', {'data-role': 'counter-value'}).text.replace(' ', ''))
-            self.offers_amount = amount
-        except AttributeError:
-            print('DRIVER CLOSED')
-            self.driver.close()
-            self.start_driver()
-            self.scrape_offers_amount()
+    def scrape_offers_amount(self) -> int:
+        attempts = 0
+        while attempts < 3:
+            try:
+                soup = BeautifulSoup(self.driver.page_source, 'html5lib')
+                user_info = soup.find('div', {'data-box-name': 'user info'})
+                amount = int(user_info.find('span', {'data-role': 'counter-value'}).text.replace(' ', ''))
+                return amount
+            except AttributeError:
+                print('DRIVER CLOSED')
+                attempts += 1
+                self.driver.close()
+                self.start_driver()
+                continue
 
-    def scrape_main_categories(self):
+    def scrape_main_categories(self) -> dict:
         subs, offers = self.scrape_subcategories(self.driver.page_source)
-        self.categories = {'subs': subs, 'offers': offers}
+        return {'subs': subs, 'offers': offers}
 
     def scrape_subcategories_tree(self, categories, level):
         if level > self.max_level:
@@ -68,9 +90,9 @@ class AccountScraper:
         for category in categories:
             attempts = 0
             while attempts < 3:
-                self.sleep_time()
                 try:
-                    self.driver.get(self.allegro_url + category['href'])
+                    self.driver.get(self.ALLEGRO_URL + category['href'])
+                    self.sleep_time()
                     category['subs'], category['offers'] = self.scrape_subcategories(self.driver.page_source)
                     if len(category['subs']):
                         category['subs'], category['offers'] = self.scrape_subcategories_tree(category['subs'],
@@ -85,22 +107,24 @@ class AccountScraper:
             offers += category['offers']
         return subs, offers
 
-    def scrape_subcategories(self, page_source):  # scrapes categories and items amount form given page
-        sp = BeautifulSoup(page_source, 'html5lib')
-        tags = sp.find('div', {'data-box-name': 'Categories'}).find('div', {'data-role': 'Categories'}).ul.contents
-        subs = []
+    def scrape_subcategories(self, page_source: str):
+        """
+        scrapes categories and offers (if there is not more nested categories) from a given page
+        """
+        soup = BeautifulSoup(page_source, 'html5lib')
+        tags = soup.find('div', {'data-box-name': 'Categories'}).find('div', {'data-role': 'Categories'}).ul.contents
+        subcategories = []
         offers = []
         for tag in tags:
-            self.sleep_time()
-            if not tag.div.a:  # if category do not have subcategories
-                subs = []
+            if not tag.div.a:  # if category do not have subcategories, scrape offers and break the loop
                 offers = self.scrape_subcategory_offers(page_source)
                 break
-            name = tag.div.a.text.strip()
-            href = tag.div.a['href']
-            amount = int(tag.div.span.text)
-            subs.append({'name': name, 'href': href, 'amount': amount})
-        return subs, offers
+            else:  # scrape subcategories
+                name = tag.div.a.text.strip()
+                href = tag.div.a['href']
+                amount = int(tag.div.span.text)
+                subcategories.append({'name': name, 'href': href, 'amount': amount})
+        return subcategories, offers
 
     def scrape_subcategory_offers(self, page_source):
         offers = []
@@ -110,6 +134,7 @@ class AccountScraper:
             offers += page_offers
             if next_page_button:
                 self.driver.get(next_page_button['href'])
+                self.sleep_time()
                 source = self.driver.page_source
             else:
                 source = False
@@ -132,7 +157,6 @@ class AccountScraper:
                 self.update_ids(id_number)
                 offers.append({'id': id_number, 'price': price, 'title': title, 'link': link})
             except ValueError:
-                offers.append({'id': 0, 'price': 0, 'title': 'error', 'link': 'error'})
-                print('passed offer')
+                print('passed offer - allegro lokalnie')
         next_page_button = soup.find('a', {'data-role': 'next-page'})
         return offers, next_page_button
