@@ -8,7 +8,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 
 
 class Offer:
-    def __init__(self, id_number: int, price: float, title: str, link: str):
+    def __init__(self, *, id_number: int, price: float, title: str, link: str):
         self.id_number = id_number
         self.price = price
         self.title = title
@@ -41,6 +41,7 @@ class AccountScraper:
         print(f'scraping started on account {username}')
         self.offers_amount = self.scrape_offers_amount()
         self.categories = self.scrape_main_categories()
+        print(self.categories)
         self.categories['subs'], self.categories['offers'] = self.scrape_subcategories_tree(self.categories['subs'], 1)
         self.categories['max_level'] = self.max_level
         self.driver.close()
@@ -82,6 +83,25 @@ class AccountScraper:
         subs, offers = self.scrape_subcategories(self.driver.page_source)
         return {'subs': subs, 'offers': offers}
 
+    def scrape_subcategories(self, page_source: str):
+        """
+        scrapes categories and offers (if there is not more nested categories) from a given page
+        """
+        soup = BeautifulSoup(page_source, 'html5lib')
+        tags = soup.find('div', {'data-box-name': 'Categories'}).find('div', {'data-role': 'Categories'}).ul.contents
+        subcategories = []
+        offers = []
+        for tag in tags:
+            if not tag.div.a:  # if category do not have subcategories, scrape offers and break the loop
+                offers = self.scrape_subcategory_offers(page_source)
+                break
+            else:  # scrape subcategories
+                name = tag.div.a.text.strip()
+                href = tag.div.a['href']
+                amount = int(tag.div.span.text)
+                subcategories.append({'name': name, 'href': href, 'amount': amount})
+        return subcategories, offers
+
     def scrape_subcategories_tree(self, categories, level):
         if level > self.max_level:
             self.max_level = level
@@ -106,25 +126,6 @@ class AccountScraper:
                 break
             offers += category['offers']
         return subs, offers
-
-    def scrape_subcategories(self, page_source: str):
-        """
-        scrapes categories and offers (if there is not more nested categories) from a given page
-        """
-        soup = BeautifulSoup(page_source, 'html5lib')
-        tags = soup.find('div', {'data-box-name': 'Categories'}).find('div', {'data-role': 'Categories'}).ul.contents
-        subcategories = []
-        offers = []
-        for tag in tags:
-            if not tag.div.a:  # if category do not have subcategories, scrape offers and break the loop
-                offers = self.scrape_subcategory_offers(page_source)
-                break
-            else:  # scrape subcategories
-                name = tag.div.a.text.strip()
-                href = tag.div.a['href']
-                amount = int(tag.div.span.text)
-                subcategories.append({'name': name, 'href': href, 'amount': amount})
-        return subcategories, offers
 
     def scrape_subcategory_offers(self, page_source):
         offers = []
@@ -155,7 +156,7 @@ class AccountScraper:
             try:
                 id_number = int(tag.find('a')['href'].split('-')[-1].split('?')[0])
                 self.update_ids(id_number)
-                offers.append({'id': id_number, 'price': price, 'title': title, 'link': link})
+                offers.append(Offer(id_number=id_number, price=price, title=title, link=link))
             except ValueError:
                 print('passed offer - allegro lokalnie')
         next_page_button = soup.find('a', {'data-role': 'next-page'})

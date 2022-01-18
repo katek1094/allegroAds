@@ -17,7 +17,7 @@ class ExcelWriter:
     col = 1
     max_level = 0
 
-    def __init__(self, username, categories):
+    def __init__(self, username: str, categories: dict):
         print(f'excel writer started on account {username}')
         self.username = username
         self.categories = categories
@@ -44,7 +44,7 @@ class ExcelWriter:
         print(sum)  # amount bierze pod uwagę rozmiary
         ids = set()
         for offer in self.categories['offers']:
-            ids.add(offer['id'])
+            ids.add(offer.id_number)
         print(len(ids))  # rzeczywista liczba ofert - napisana pod nazwą sklepu
 
     def write_offers_sheet(self):
@@ -53,10 +53,10 @@ class ExcelWriter:
         self.row = 1
         self.col = 1
         for offer in self.categories['offers']:
-            self.ws.cell(row=self.row, column=self.col, value=offer['title'])
-            self.ws.cell(row=self.row, column=self.col + 1, value=offer['price'])
-            self.ws.cell(row=self.row, column=self.col + 2, value=offer['link'])
-            self.ws.cell(row=self.row, column=self.col + 3, value=offer['id'])
+            self.ws.cell(row=self.row, column=self.col, value=offer.title)
+            self.ws.cell(row=self.row, column=self.col + 1, value=offer.price)
+            self.ws.cell(row=self.row, column=self.col + 2, value=offer.link)
+            self.ws.cell(row=self.row, column=self.col + 3, value=offer.id_number)
             self.row += 1
 
     def write_prices_sheet(self):
@@ -73,7 +73,7 @@ class ExcelWriter:
         self.col += 1
         self.write_prices(self.categories['subs'], 0)
 
-    def write_prices(self, categories, level):
+    def write_prices(self, categories, level: int):
         if level >= len(self.fills):
             fill_index = len(self.fills) - 1
         else:
@@ -99,7 +99,7 @@ class ExcelWriter:
     def generate_prices_from_offers(offers):
         prices = []
         for offer in offers:
-            prices.append(offer['price'])
+            prices.append(offer.price)
         return prices
 
     def write_raw_data_sheet(self):
