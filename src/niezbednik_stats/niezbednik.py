@@ -13,7 +13,7 @@ def create_session():
     return requests.Session()
 
 
-def login(s):
+def login(s: requests.Session):
     load_dotenv()
 
     password = os.getenv('NIEZBEDNIK_PASSWORD')
@@ -33,7 +33,7 @@ def login(s):
         raise Exception('CAN NOT LOGIN INTO NIEZBEDNIK SPRZEDAWCY')
 
 
-def get_account_raw_data(s: requests.Session, account_name):
+def get_account_raw_data(s: requests.Session, account_name: str):
     api_url = 'https://niezbedniksprzedawcy.pl/StatystykiAllegro/get_offers_stats?format=json'
     params = {'q': account_name,
               'p': 1,  # pagination control
@@ -44,22 +44,45 @@ def get_account_raw_data(s: requests.Session, account_name):
     return r.json()
 
 
+"""
+return value structure:
+{
+    limit: int, the same value as in request
+    pages: int, how many pages there are to see
+    offset: int, number of page returned
+    offers: data about offers, nested deeper
+    series: [
+        {
+            name: offer id
+            data: data for 30 days (array) : [
+                [
+                    timestamp - in miliseconds,
+                    value - offer position in accuracy
+                ]
+            ]
+        }
+    ]
+
+}
+"""
+
 Record = namedtuple('Record', 'date value')
 OfferData = namedtuple('OfferData', 'id_number records')
 
 
+def create_record(record):
+    timestamp_in_ms, position = record
+    record_date = datetime.datetime.fromtimestamp(timestamp_in_ms / 1000).date()
+    return Record(record_date, position)
+
+
 def format_account_data(data):
-    lens = []
     formatted_data = []
     for offer in data['series']:
-        lens.append(len(offer['data']))
         records = []
         for record in offer['data']:
-            timestamp_in_ms, position = record
-            record_date = datetime.datetime.fromtimestamp(timestamp_in_ms / 1000).date()
-            records.append(Record(record_date, position))
+            records.append(create_record(record))
         formatted_data.append(OfferData(offer['name'], tuple(records)))
-    print(max(lens))
 
     return formatted_data
 
@@ -77,7 +100,6 @@ columns_for_dates = generate_columns_for_dates_dict()
 
 
 def get_point_for_day_data(arr):
-    print(len(arr))
     points = 0
     for dt in arr:
         if dt == 1:
@@ -104,10 +126,10 @@ def get_point_for_day_data(arr):
             points += 0.1
         else:
             raise Exception('wrong value or code "if" ranges')
-    return round(points/(len(arr)), 2)
+    return round(points / (len(arr)), 2)
 
 
-def create_excel(data: [OfferData], username):
+def create_excel(data: [OfferData], username: str):
     wb = Workbook()
     ws = wb.active
 
@@ -147,19 +169,10 @@ def create_excel(data: [OfferData], username):
     avg_points = []
     for x in range(10):
         print(x)
-        print(x*3, x*3 + 2)
-        avg_points.append(mean(points[x*3:x*3 + 2]))
+        print(x * 3, x * 3 + 2)
+        avg_points.append(mean(points[x * 3:x * 3 + 2]))
     for col, point in enumerate(avg_points):
         ws.cell(row=6, column=col + 2).value = point
-
-    # # WRITE NEW DATA IN NEW SHEET
-    # ws = wb.create_sheet('stats')
-    # for date, column in columns_for_dates.items():
-    #     ws.cell(row=1, column=column).value = date.strftime('%d-%m')
-    #
-    # for col, day in enumerate(days):
-    #     for row, dt in enumerate(day):
-    #         ws.cell(row=row+2, column=col+2).value = dt
 
     wb.save(f'/home/kajetan/Desktop/{username}.xlsx')
 
@@ -170,7 +183,7 @@ def create_account_stats_report(s, account_name):
     create_excel(results, account_name)
 
 
-s = create_session()
-login(s)
+session = create_session()
+login(session)
 
-create_account_stats_report(s, 'sklep-miszmasz')
+create_account_stats_report(session, 'sklep-miszmasz')
