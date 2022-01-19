@@ -14,6 +14,7 @@ class IdsScraper:
     ids = []
 
     def __init__(self, target_amount):
+        # noinspection PyArgumentList
         self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
         self.target_amount = target_amount
 

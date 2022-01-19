@@ -24,6 +24,7 @@ class SeleniumDriver:
         self.start(url)
 
     def start(self, url):
+        # noinspection PyArgumentList
         self.driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
         self.driver.get(url)
         self.driver.maximize_window()
