@@ -53,14 +53,22 @@ class ExcelWriter:
     def write_offers_sheet(self):
         self.wb.create_sheet('offers')
         self.ws = self.wb['offers']
-        self.row = 1
-        self.col = 1
+        row = 1
+        col = 1
+        self.ws.cell(row=row, column=col, value='kategoria')
+        self.ws.cell(row=row, column=col + 1, value='tytuł oferty')
+        self.ws.cell(row=row, column=col + 2, value='cena')
+        self.ws.cell(row=row, column=col + 3, value='id')
+        self.ws.cell(row=row, column=col + 4, value='url')
+        row += 1
+
         for offer in self.categories[0].offers:
-            self.ws.cell(row=self.row, column=self.col, value=offer.title)
-            self.ws.cell(row=self.row, column=self.col + 1, value=offer.price)
-            self.ws.cell(row=self.row, column=self.col + 2, value=offer.link)
-            self.ws.cell(row=self.row, column=self.col + 3, value=offer.id_number)
-            self.row += 1
+            self.ws.cell(row=row, column=col, value=offer.category_list)
+            self.ws.cell(row=row, column=col + 1, value=offer.title)
+            self.ws.cell(row=row, column=col + 2, value=offer.price)
+            self.ws.cell(row=row, column=col + 3, value=offer.id_number)
+            self.ws.cell(row=row, column=col + 4, value=offer.link)
+            row += 1
 
     def write_prices_sheet(self):
         self.wb.create_sheet('prices')
