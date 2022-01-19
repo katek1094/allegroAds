@@ -16,13 +16,14 @@ AGENCY_PASSWORD = os.getenv('AGENCY_PASSWORD')
 class AgencyDriver(SeleniumDriver):
     current_account = None
 
-    def __init__(self):
+    def __init__(self, open_clients_list=True):
         super().__init__('https://ads.allegro.pl/panel/agency/clients')
 
         self.click((By.CSS_SELECTOR, 'button[data-role="accept-consent"]'))
         self.fill_and_submit_login_form()
         self.click((By.CSS_SELECTOR, 'button[aria-label="Zamknij"]'))
-        self.click((By.LINK_TEXT, 'Przełącz na klienta'))
+        if open_clients_list:
+            self.click((By.LINK_TEXT, 'Przełącz na klienta'))
 
     def fill_and_submit_login_form(self):
         self.sleep()
