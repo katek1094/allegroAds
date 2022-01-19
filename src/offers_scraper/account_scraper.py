@@ -103,6 +103,12 @@ class AccountScraper:
         for tag in tags:
             if not tag.div.a:  # if category do not have subcategories, scrape offers and break the loop
                 offers = self.scrape_subcategory_offers(page_source)
+                subcategories = []
+                """
+                this subcategories reset have to be here,
+                because sometimes in allegro there is a infinite loop of categories, 
+                which from only one is not clickable
+                """
                 break
             else:  # scrape subcategories
                 name = tag.div.a.text.strip()

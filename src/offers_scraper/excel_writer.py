@@ -5,7 +5,7 @@ import statistics
 from openpyxl import Workbook
 from openpyxl.styles.fills import PatternFill
 
-from .data_types import Category
+from .data_types import Category, Offer
 
 
 class ExcelWriter:
@@ -41,10 +41,10 @@ class ExcelWriter:
 
     def playground(self):
         print(len(self.categories[0].offers))  # nie bierze pod uwagę tego, że jedno id może być w kilku kategoriach
-        sum = 0
+        s = 0
         for cat in self.categories[0].subcategories:
-            sum += cat.offers_amount
-        print(sum)  # amount bierze pod uwagę rozmiary
+            s += cat.offers_amount
+        print(s)  # amount bierze pod uwagę rozmiary
         ids = set()
         for offer in self.categories[0].offers:
             ids.add(offer.id_number)
@@ -113,10 +113,10 @@ class ExcelWriter:
             self.ws.cell(column=2, row=2, value=datetime.datetime.now())
 
         def write_data_labels():
-            self.ws.cell(column=self.max_level + 2, row=self.row - 1, value='avg price')
-            self.ws.cell(column=self.max_level + 3, row=self.row - 1, value='median price')
-            self.ws.cell(column=self.max_level + 4, row=self.row - 1, value='min price')
-            self.ws.cell(column=self.max_level + 5, row=self.row - 1, value='max price')
+            self.ws.cell(column=self.max_level + 3, row=self.row - 1, value='avg price')
+            self.ws.cell(column=self.max_level + 4, row=self.row - 1, value='median price')
+            self.ws.cell(column=self.max_level + 5, row=self.row - 1, value='min price')
+            self.ws.cell(column=self.max_level + 6, row=self.row - 1, value='max price')
 
         self.ws.title = 'raw data'
         self.row = 5
@@ -137,16 +137,17 @@ class ExcelWriter:
         for category in categories:
             self.add_data(category)
             self.col += 1
-            for x in range(self.col - 1, self.max_level + 2):
+            for x in range(self.col - 1, self.max_level + 3):
                 self.ws.cell(column=x, row=self.row).fill = self.fills[fill_index]
-            self.write_prices_stats(self.generate_prices_from_offers(category.offers), self.row)
+            self.write_prices_stats(category.offers, self.row)
             self.row += 1
             if len(category.subcategories):
                 self.write_categories(category.subcategories, level + 1)
             self.col -= 1
 
-    def write_prices_stats(self, prices, row):
-        self.ws.cell(column=self.max_level + 2, row=row, value=round(statistics.mean(prices), 2))
-        self.ws.cell(column=self.max_level + 3, row=row, value=statistics.median(prices))
-        self.ws.cell(column=self.max_level + 4, row=row, value=min(prices))
-        self.ws.cell(column=self.max_level + 5, row=row, value=max(prices))
+    def write_prices_stats(self, offers: [Offer], row):
+        prices = self.generate_prices_from_offers(offers)
+        self.ws.cell(column=self.max_level + 3, row=row, value=round(statistics.mean(prices), 2))
+        self.ws.cell(column=self.max_level + 4, row=row, value=statistics.median(prices))
+        self.ws.cell(column=self.max_level + 5, row=row, value=min(prices))
+        self.ws.cell(column=self.max_level + 6, row=row, value=max(prices))
