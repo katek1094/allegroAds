@@ -10,7 +10,7 @@ from agency_panel import scrape_planner
 
 # scrape_all_accounts(generate_accounts_list())
 
-# scrape_account('misumi24')
+scrape_account('NEUTREA')
 
 # scrape_best_ids()
 

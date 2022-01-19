@@ -2,6 +2,7 @@ import random
 import time
 
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.ui import WebDriverWait
@@ -24,10 +25,20 @@ class SeleniumDriver:
         self.start(url)
 
     def start(self, url):
+        # noinspection DuplicatedCode
+        opt = Options()
+        opt.headless = True
+        opt.add_argument("--window-size=1920,1080")
+        opt.add_argument("--headless")
+        opt.add_argument("--disable-gpu")
+        a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        c = a + b
+        opt.add_argument(c)
         # noinspection PyArgumentList
-        self.driver = webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
+        self.driver = webdriver.Chrome(options=opt, service=Service(ChromeDriverManager().install()))
+
         self.driver.get(url)
-        self.driver.maximize_window()
 
     def sleep(self, duration=None):
         if self.sleep_mode or duration:

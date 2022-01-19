@@ -3,10 +3,26 @@ import time
 
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
 from .data_types import Offer, Category
+
+
+def start_driver():
+    # noinspection DuplicatedCode
+    options = Options()
+    options.headless = True
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+    c = a + b
+    options.add_argument(c)
+    # noinspection PyArgumentList
+    return webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
 
 
 class AccountScraper:
@@ -20,8 +36,8 @@ class AccountScraper:
         self.ids = set()
         self.max_level = 0
         # noinspection PyArgumentList
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-        self.driver.minimize_window()
+
+        self.driver = start_driver()
 
         print(f'scraping started on account {username}')
 
@@ -43,11 +59,6 @@ class AccountScraper:
         if len_after != len_before:
             print(first, f"scraped {len_after}/{self.categories[0].offers_amount} offers", sep='', end=end)
 
-    def start_driver(self):
-        # noinspection PyArgumentList
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
-        self.driver.minimize_window()
-
     def sleep_time(self):
         time.sleep(random.randrange(self.MIN_SLEEP_TIME, self.MAX_SLEEP_TIME))  # to avoid allegro captcha ban
 
@@ -64,7 +75,7 @@ class AccountScraper:
                 print('DRIVER CLOSED')
                 attempts += 1
                 self.driver.close()
-                self.start_driver()
+                self.driver = start_driver()
                 continue
 
     def scrape_subcategories_tree(self, categories: [Category], level):
@@ -86,7 +97,7 @@ class AccountScraper:
                     print('DRIVER CLOSED')
                     attempts += 1
                     self.driver.close()
-                    self.start_driver()
+                    self.driver = start_driver()
                     continue
                 break
             offers += category.offers

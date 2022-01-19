@@ -1,8 +1,10 @@
+import time
+
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-import time
 
 
 class IdsScraper:
@@ -14,8 +16,18 @@ class IdsScraper:
     ids = []
 
     def __init__(self, target_amount):
+        # noinspection DuplicatedCode
+        opt = Options()
+        opt.headless = True
+        opt.add_argument("--window-size=1920,1080")
+        opt.add_argument("--headless")
+        opt.add_argument("--disable-gpu")
+        a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        c = a + b
+        opt.add_argument(c)
         # noinspection PyArgumentList
-        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+        self.driver = webdriver.Chrome(options=opt, service=Service(ChromeDriverManager().install()))
         self.target_amount = target_amount
 
     def get_offers_ids(self):
@@ -71,6 +83,7 @@ class UrlIdsScraper(IdsScraper):
     url - url of page inside Allegro user's store with offers to be scraped
     target_amount - how many offers will be scraped
     """
+
     def __init__(self, url: str, target_amount: int):
         super().__init__(target_amount)
         self.driver.get(url)
