@@ -11,6 +11,8 @@ def create_click_command(*args) -> dict:
     return create_command('click', *args)
 
 
+# TODO: create_command_by_xpath - create this function
+
 class Commands:
     def __init__(self, account_name):
         self.open_agency_panel = create_command('selectWindow', 'tab=open',
@@ -29,13 +31,18 @@ class Commands:
         self.select_last_month = create_click_command("xpath=//*[text()='Ostatnie 30 dni']")
         self.select_last_billing_month = create_click_command("xpath=//*[text()='Poprzedni okres rozliczeniowy']")
         self.select_current_billing_month = create_click_command("xpath=//*[text()='Bieżący okres rozliczeniowy']")
-
+        # updates calendar range
         self.update = create_click_command("xpath=//*[text()='Aktualizuj']")
 
+        # chart dataset options
+        self.open_orange_select = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/select')
+        self.open_grey_select = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[4]/div/select')
+        self.select_cost_orange = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/select/option[5]')
+        self.select_return_grey = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[4]/div/select/option[5]')
+
+        # reports downloading commands
         self.select_offers_view = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[4]/div[1]/div/div[3]/button')
         self.open_files = create_click_command('xpath=//*[@id="main"]/div[2]/div/header/div/div/div[2]/div/div/div/div/div[1]/nav/div/a')
-        # self.click_download_report = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[3]/div[2]/button[3]')
-        self.click_download_report = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[4]/div[2]/button[3]')
-        # self.click_download_file = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[2]/div/div[2]/div/div[6]/div[2]/button[2]')
+        self.click_generate_report = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[4]/div[2]/button[3]')
         self.click_download_file = create_click_command('xpath=//*[@id="layoutBody"]/div/div[2]/div/div[2]/div/div[6]/div[2]/button[2]')
 
