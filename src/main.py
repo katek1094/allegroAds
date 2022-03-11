@@ -5,40 +5,24 @@ from utils import get_all_accounts_from_excel
 
 from agency_panel import scrape_planner
 
-# generate_reports([acc.name for acc in get_all_accounts_from_excel()])
+# scrape_account('account_name')
 
+# a = scrape_best_ids('account_name', 'accuracy', 40)
 
-# a = False
-# for account in scrape_accounts():
-#     if account == 'Ecomi-screen':
-#         a = True
-#     if a:
-#         scrape_account(account)+
+# scrape_ids_from_url('url', offers_amount)
 
-# scrape_account('Mario_Store')
-
-# a = scrape_best_ids('TopkKable', 'accuracy', 40)
-# scrape_ids_from_url('https://allegro.pl/uzytkownik/handlowiec-rs-pl/spawarki-polautomaty-spawalnicze-306093?marka=Magnum', 10)
-
-scrape_planner('szkło hartowane')
-# format()
-
-# generate_json_script('download_reports', get_all_accounts_from_excel())
+# scrape_planner('phrase')
 
 # generate_json_script('last_month', get_all_accounts_from_excel())
 
-# scrape_all_accounts(generate_accounts_list())
+# generate_reports([acc.name for acc in get_all_accounts_from_excel()])
 
-# scrape_account('Auto-od-A-do-Z')
-
-# scrape_best_ids('TopkKable', 'accuracy', 20)
-
-# r1 = Requirement('_BRUBECK_', 'sponsored', 'last_month', 'campaigns')
-# r2 = Requirement('art-fotografia', 'sponsored', 'last_week', 'campaigns')
+# r1 = Requirement('account_name', 'sponsored', 'last_month', 'campaigns')
+# r2 = Requirement('art-account_name', 'sponsored', 'last_week', 'campaigns')
 #
 #
-# # r3 = Requirement('Kaysershop', 'sponsored', 'yesterday', 'offers')
-# # r4 = Requirement('Kaysershop', 'graphic', 'yesterday', 'groups')
+# # r3 = Requirement('account_name', 'sponsored', 'yesterday', 'offers')
+# # r4 = Requirement('account_name', 'graphic', 'yesterday', 'groups')
 # #
 # #
 # def scrape_stats(requirements):
@@ -46,7 +30,6 @@ scrape_planner('szkło hartowane')
 #     for r in requirements:
 #         scraper = find_scraper(driver, r)
 #         print(scraper.scrape_stats())
-#
 #
 # scrape_stats([r1, r2])
 
