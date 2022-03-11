@@ -128,7 +128,3 @@ def run_reports_downloader(accounts_list):
         reports_ready = check_for_reports(accounts_list)
     download_reports(accounts_list)
 
-
-accounts = ['_BRUBECK_', 'E-PHARM', 'MS-Instalacje']
-
-run_reports_downloader(accounts)

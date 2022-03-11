@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+# from .f import source
+
 
 class IdsScraper:
     """
@@ -18,14 +20,14 @@ class IdsScraper:
     def __init__(self, target_amount):
         # noinspection DuplicatedCode
         opt = Options()
-        opt.headless = True
+        # opt.headless = True
         opt.add_argument("--window-size=1920,1080")
-        opt.add_argument("--headless")
-        opt.add_argument("--disable-gpu")
-        a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
-        c = a + b
-        opt.add_argument(c)
+        # opt.add_argument("--headless")
+        # opt.add_argument("--disable-gpu")
+        # a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        # b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        # c = a + b
+        # opt.add_argument(c)
         # noinspection PyArgumentList
         self.driver = webdriver.Chrome(options=opt, service=Service(ChromeDriverManager().install()))
         self.target_amount = target_amount
@@ -35,10 +37,11 @@ class IdsScraper:
         while not finished:
             ids, next_page_button = self.get_ids_from_page(self.target_amount - len(self.ids))
             self.ids += ids
-            finished = len(self.ids) == self.target_amount or not next_page_button
+            finished = len(self.ids) >= self.target_amount or not next_page_button
 
     def get_ids_from_page(self, limit):
         soup = BeautifulSoup(self.driver.page_source, 'html5lib')
+        # soup = BeautifulSoup(source, 'html5lib')
         items_div = soup.find('div', {'data-box-name': 'items container'})
         offers = items_div.findAll('article', {'data-role': 'offer'})[:limit]
         ids = []
@@ -70,8 +73,8 @@ class BestOffersScraper(IdsScraper):
             self.driver.get(self.allegro_url + '/uzytkownik/' + username + '?order=qd')
 
         self.get_offers_ids()
-        if self.target_amount > len(self.ids):
-            raise ValueError('target amount was bigger than amount of offers to scrape!')
+        # if self.target_amount > len(self.ids):
+        #     raise ValueError('target amount was bigger than amount of offers to scrape!')
         print('scraping finished')
         print(self.ids)
         self.driver.close()
@@ -88,8 +91,8 @@ class UrlIdsScraper(IdsScraper):
         super().__init__(target_amount)
         self.driver.get(url)
         self.get_offers_ids()
-        if self.target_amount > len(self.ids):
-            raise ValueError('target amount was bigger than amount of offers to scrape!')
+        # if self.target_amount > len(self.ids):
+        #     raise ValueError('target amount was bigger than amount of offers to scrape!')
         print('scraping finished')
         print(self.ids)
         self.driver.close()

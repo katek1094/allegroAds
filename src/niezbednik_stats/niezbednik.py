@@ -126,7 +126,7 @@ def get_point_for_day_data(arr):
             points += 0.1
         else:
             raise Exception('wrong value or code "if" ranges')
-    return round(points / (len(arr)), 2)
+    return round(points, 2)
 
 
 def create_excel(data: [OfferData], username: str):
@@ -168,8 +168,8 @@ def create_excel(data: [OfferData], username: str):
 
     avg_points = []
     for x in range(10):
-        print(x)
-        print(x * 3, x * 3 + 2)
+        # print(x)
+        # print(x * 3, x * 3 + 2)
         avg_points.append(mean(points[x * 3:x * 3 + 2]))
     for col, point in enumerate(avg_points):
         ws.cell(row=6, column=col + 2).value = point
@@ -186,4 +186,4 @@ def create_account_stats_report(s, account_name):
 session = create_session()
 login(session)
 
-create_account_stats_report(session, 'sklep-miszmasz')
+create_account_stats_report(session, 'fasdfa')

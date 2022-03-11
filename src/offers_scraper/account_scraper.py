@@ -5,29 +5,29 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 from .data_types import Offer, Category
 
 
 def start_driver():
     # noinspection DuplicatedCode
-    options = Options()
-    options.headless = True
-    options.add_argument("--window-size=1920,1080")
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-    b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
-    c = a + b
-    options.add_argument(c)
+    # options = Options()
+    # options.headless = True
+    # options.add_argument("--window-size=1920,1080")
+    # options.add_argument("--headless")
+    # options.add_argument("--disable-gpu")
+    # a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+    # b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+    # c = a + b
+    # options.add_argument(c)
     # noinspection PyArgumentList
-    return webdriver.Chrome(options=options, service=Service(ChromeDriverManager().install()))
+    return webdriver.Firefox(service=Service(GeckoDriverManager().install()))
 
 
 class AccountScraper:
-    MIN_SLEEP_TIME = 1
-    MAX_SLEEP_TIME = 3
+    MIN_SLEEP_TIME = 2
+    MAX_SLEEP_TIME = 5
     ALLEGRO_URL = 'https://allegro.pl'
 
     categories: [Category]
@@ -59,11 +59,16 @@ class AccountScraper:
         if len_after != len_before:
             print(first, f"scraped {len_after}/{self.categories[0].offers_amount} offers", sep='', end=end)
 
-    def sleep_time(self):
-        time.sleep(random.randrange(self.MIN_SLEEP_TIME, self.MAX_SLEEP_TIME))  # to avoid allegro captcha ban
+    def sleep_time(self, mi=None, ma=None):
+        if not mi:
+            mi = self.MIN_SLEEP_TIME
+        if not ma:
+            ma = self.MAX_SLEEP_TIME
+        time.sleep(random.randrange(mi, ma))  # to avoid allegro captcha ban
 
     def scrape_offers_amount(self, username) -> int:
         self.driver.get(self.ALLEGRO_URL + '/uzytkownik/' + username)
+        self.sleep_time(14, 16)
         attempts = 0
         while attempts < 3:
             try:
@@ -154,7 +159,7 @@ class AccountScraper:
             tail = float(price_tail.text[:2])
             front = float(price_tail.previous_sibling[:-1].replace(" ", ''))
             price = front + tail / 100
-            title = tag.findAll('a')[1].text
+            title = tag.findAll('a')[1].div.h2.text
             link = tag.find('a')['href']
             try:
                 id_number = int(tag.find('a')['href'].split('-')[-1].split('?')[0])

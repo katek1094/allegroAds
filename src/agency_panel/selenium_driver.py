@@ -16,9 +16,9 @@ options.add_experimental_option('prefs', prefs)
 class SeleniumDriver:
     driver = None
 
-    TIMEOUT = 6
-    SLEEP_TIME_MIN = 1
-    SLEEP_TIME_MAX = 3
+    TIMEOUT = 10
+    SLEEP_TIME_MIN = 2
+    SLEEP_TIME_MAX = 4
     sleep_mode = False
 
     def __init__(self, url):
@@ -27,14 +27,14 @@ class SeleniumDriver:
     def start(self, url):
         # noinspection DuplicatedCode
         opt = Options()
-        opt.headless = True
+        # opt.headless = True
         opt.add_argument("--window-size=1920,1080")
-        opt.add_argument("--headless")
-        opt.add_argument("--disable-gpu")
-        a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
-        c = a + b
-        opt.add_argument(c)
+        # opt.add_argument("--headless")
+        # opt.add_argument("--disable-gpu")
+        # a = "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        # b = " (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        # c = a + b
+        # opt.add_argument(c)
         # noinspection PyArgumentList
         self.driver = webdriver.Chrome(options=opt, service=Service(ChromeDriverManager().install()))
 

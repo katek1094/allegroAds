@@ -5,7 +5,9 @@ from .commands import Commands
 possible_modes = (
     'campaigns',
     'last_week',
-    'last_month'
+    'last_month',
+    'generate_reports',
+    'download_reports',
 )
 
 
@@ -15,7 +17,12 @@ def generate_json_script(mode: str, accounts_list: list):
 
     commands_array = []
 
-    for account_name in accounts_list:
+    if mode == possible_modes[3] or mode == possible_modes[4]:
+        cmd = Commands('empty')
+        commands_array.append(cmd.open_agency_panel)
+        commands_array.append(cmd.open_clients_list)
+
+    for account_name in [account.name for account in accounts_list]:
         commands = Commands(account_name)
 
         account_commands_array = [
@@ -38,6 +45,28 @@ def generate_json_script(mode: str, accounts_list: list):
                 commands.select_last_month,
                 commands.update,
             ])
+        if mode == possible_modes[3]:
+            account_commands_array = account_commands_array[2:]
+
+            account_commands_array.extend([
+                commands.open_stats,
+                commands.open_calendar,
+                commands.select_last_billing_month,
+                commands.update,
+                commands.select_offers_view,
+                commands.click_download_report,
+                commands.open_client_account, # in this situation list
+            ])
+
+        if mode == possible_modes[4]:
+            account_commands_array = account_commands_array[2:]
+            account_commands_array.extend([
+                commands.open_files,
+                commands.click_download_file,
+                commands.open_client_account,  # in this situation list
+            ])
+
+
 
         commands_array.extend(account_commands_array)
 

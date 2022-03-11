@@ -31,3 +31,11 @@ class Commands:
         self.select_current_billing_month = create_click_command("xpath=//*[text()='Bieżący okres rozliczeniowy']")
 
         self.update = create_click_command("xpath=//*[text()='Aktualizuj']")
+
+        self.select_offers_view = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[4]/div[1]/div/div[3]/button')
+        self.open_files = create_click_command('xpath=//*[@id="main"]/div[2]/div/header/div/div/div[2]/div/div/div/div/div[1]/nav/div/a')
+        # self.click_download_report = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[3]/div[2]/button[3]')
+        self.click_download_report = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[4]/div[2]/button[3]')
+        # self.click_download_file = create_click_command('xpath=//*[@id="layoutBody"]/div/div/div[2]/div/div[2]/div/div[6]/div[2]/button[2]')
+        self.click_download_file = create_click_command('xpath=//*[@id="layoutBody"]/div/div[2]/div/div[2]/div/div[6]/div[2]/button[2]')
+

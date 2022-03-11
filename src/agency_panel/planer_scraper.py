@@ -1,3 +1,5 @@
+import time
+
 from bs4 import BeautifulSoup
 from openpyxl import Workbook
 from selenium.common.exceptions import TimeoutException
@@ -44,6 +46,7 @@ def scrape_results(page_source):
     soup = BeautifulSoup(page_source, 'html5lib')
     table_body = soup.find('tbody')
     trs = table_body.find_all('tr')
+    print(trs)
 
     results = []
 
@@ -54,14 +57,13 @@ def scrape_results(page_source):
         cpc = td[2].text
         concurrency = td[3].text
         results.append(PlanerResult(phrase, concurrency, avg_monthly_coverage, cpc))
-
     return results
 
 
 def scrape_phrase(driver: AgencyDriver, phrase: str):
     driver.driver.get(generate_url_from_phrase(phrase))
     try:
-        driver.wait(ec.presence_of_element_located((By.CSS_SELECTOR, 'table')), 1)
+        driver.wait(ec.presence_of_element_located((By.CSS_SELECTOR, 'table')))
     except TimeoutException:
         return []
     return scrape_results(driver.page_source)
