@@ -36,14 +36,14 @@ class Commands:
         self.update = create_xpath_click_command("//*[text()='Aktualizuj']")
 
         # chart dataset options
-        self.open_orange_select = create_xpath_click_command(
-            '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/select')
-        self.open_grey_select = create_xpath_click_command(
-            '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[4]/div/select')
-        self.select_cost_orange = create_xpath_click_command(
-            '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/select/option[5]')
-        self.select_return_grey = create_xpath_click_command(
-            '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[4]/div/select/option[5]')
+        # self.open_orange_select = create_xpath_click_command(
+        #     '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/select')
+        # self.open_grey_select = create_xpath_click_command(
+        #     '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[4]/div/select')
+        # self.select_cost_orange = create_xpath_click_command(
+        #     '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[2]/div/select/option[5]')
+        # self.select_return_grey = create_xpath_click_command(
+        #     '//*[@id="layoutBody"]/div/div/div[3]/div/div/div/div[1]/div[1]/div[1]/div[4]/div/select/option[5]')
 
         # reports downloading commands
         self.select_offers_view = create_xpath_click_command(

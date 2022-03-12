@@ -37,10 +37,10 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
                 commands.open_calendar,
                 commands.select_last_week,
                 commands.update,
-                commands.open_orange_select,
-                commands.select_cost_orange,
-                commands.open_calendar,
-                commands.select_return_grey
+                # commands.open_orange_select,
+                # commands.select_cost_orange,
+                # commands.open_grey_select,
+                # commands.select_return_grey
             ])
         if mode == possible_modes[2]:  # last month mode
             account_commands_array.extend([
@@ -48,10 +48,10 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
                 commands.open_calendar,
                 commands.select_last_month,
                 commands.update,
-                commands.open_orange_select,
-                commands.select_cost_orange,
-                commands.open_calendar,
-                commands.select_return_grey
+                # commands.open_orange_select,
+                # commands.select_cost_orange,
+                # commands.open_grey_select,
+                # commands.select_return_grey
             ])
         if mode == possible_modes[3]:  # generate reports mode
             account_commands_array = account_commands_array[2:]
