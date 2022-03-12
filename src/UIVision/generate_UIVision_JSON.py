@@ -11,7 +11,7 @@ possible_modes = (
 )
 
 
-def generate_json_script(mode: str, accounts_list: list):
+def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
     if mode not in possible_modes:
         raise ValueError(f'mode : "{mode}" is not allowed. Please select from one of possible modes: {possible_modes}')
 
@@ -76,5 +76,8 @@ def generate_json_script(mode: str, accounts_list: list):
 
         commands_array.extend(account_commands_array)
 
-    with open('../macro.json', 'w') as f:
-        json.dump(commands_array, f, ensure_ascii=False)
+    if dump:
+        with open('../macro.json', 'w') as f:
+            json.dump(commands_array, f, ensure_ascii=False)
+    else:
+        return commands_array

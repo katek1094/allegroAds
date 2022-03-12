@@ -1,6 +1,6 @@
 from offers_scraper import scrape_best_ids, scrape_account, scrape_ids_from_url
 
-from UIVision import generate_json_script
+from UIVision import generate_json_script, generate_macros_by_priority
 from utils import get_all_accounts_from_excel
 
 from agency_panel import scrape_planner
@@ -13,9 +13,11 @@ from agency_panel import scrape_planner
 
 # scrape_planner('phrase')
 
-# generate_json_script('last_month', get_all_accounts_from_excel())
+# generate_macros_by_priority()
 
-# generate_reports([acc.name for acc in get_all_accounts_from_excel()])
+# generate_json_script('last_month', get_all_accounts_from_excel(priority=1), True)
+
+# generate_reports([acc.name for acc in get_all_accounts_from_excel()], True)
 
 # r1 = Requirement('account_name', 'sponsored', 'last_month', 'campaigns')
 # r2 = Requirement('art-account_name', 'sponsored', 'last_week', 'campaigns')

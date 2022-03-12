@@ -1,1 +1,2 @@
 from .generate_UIVision_JSON import generate_json_script
+from .macros import generate_macros_by_priority
