@@ -98,8 +98,10 @@ class AccountScraper:
                     if len(category.subcategories):
                         category.subcategories, category.offers = self.scrape_subcategories_tree(category.subcategories,
                                                                                                  level + 1)
-                except AttributeError:
+                except AttributeError as x:
+                    print(x)
                     print('DRIVER CLOSED')
+                    time.sleep(8)
                     attempts += 1
                     self.driver.close()
                     self.driver = start_driver()
@@ -159,7 +161,7 @@ class AccountScraper:
             tail = float(price_tail.text[:2])
             front = float(price_tail.previous_sibling[:-1].replace(" ", ''))
             price = front + tail / 100
-            title = tag.findAll('a')[1].div.h2.text
+            title = tag.findAll('a')[1].text
             link = tag.find('a')['href']
             try:
                 id_number = int(tag.find('a')['href'].split('-')[-1].split('?')[0])
