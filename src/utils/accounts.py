@@ -1,4 +1,7 @@
 import openpyxl
+from google.auth.exceptions import TransportError
+
+from src.google_sheets import update_accounts_list
 
 
 class AdsAccount:
@@ -29,13 +32,18 @@ class AdsAccount:
         if priority in self.VALID_PRIORITIES:
             return priority
         else:
-            print(priority)
+            print(type(priority))
             print(self.name)
             raise ValueError(f'Priority has to be one of these values: {self.VALID_PRIORITIES}')
 
 
 def get_all_accounts_from_excel(*, priority: int = False, only_graphic=False):
-    path = '/home/kajetan/Documents/pryzmat/accounts.xlsx'
+    try:
+        update_accounts_list()
+    except TransportError:
+        print('NO INTERNET CONNECTION')
+
+    path = '/home/kajetan/Documents/pryzmat/accounts.xlsx'  # TODO: make it global constant
     wb = openpyxl.load_workbook(path)
     ws = wb.active
 
@@ -45,11 +53,11 @@ def get_all_accounts_from_excel(*, priority: int = False, only_graphic=False):
     col = 1
     while True:
         account_name = ws.cell(row=row, column=col).value
-        account_monthly_budget = ws.cell(row=row, column=col + 1).value
-        account_revenue_target = ws.cell(row=row, column=col + 2).value
-        account_priority = ws.cell(row=row, column=col + 4).value
-        account_is_graphic = ws.cell(row=row, column=col + 5).value == 'tak'
         if account_name:
+            account_monthly_budget = ws.cell(row=row, column=col + 1).value
+            account_revenue_target = ws.cell(row=row, column=col + 2).value
+            account_priority = int(ws.cell(row=row, column=col + 4).value)
+            account_is_graphic = ws.cell(row=row, column=col + 5).value == 'tak'
             accounts_list.append(
                 AdsAccount(account_name, account_priority, account_monthly_budget, account_revenue_target,
                            account_is_graphic))
