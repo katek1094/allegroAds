@@ -16,7 +16,7 @@ class AdsAccount:
         self.is_graphic = is_graphic
 
     def __repr__(self):
-        return self.name
+        return 'AdsAccount' + self.name
 
     @property
     def weekly_budget(self) -> float:
@@ -41,7 +41,7 @@ def get_all_accounts_from_excel(*, priority: int = False, only_graphic=False):
     try:
         update_accounts_list()
     except TransportError:
-        print('NO INTERNET CONNECTION')
+        print('NO INTERNET CONNECTION. USING LOCAL COPY OF ACCOUNTS LIST')
 
     path = '/home/kajetan/Documents/pryzmat/accounts.xlsx'  # TODO: make it global constant
     wb = openpyxl.load_workbook(path)
@@ -66,8 +66,8 @@ def get_all_accounts_from_excel(*, priority: int = False, only_graphic=False):
             break
 
     if priority:
-        return [account for account in accounts_list if account.priority == priority]
-    elif only_graphic:
-        return [account for account in accounts_list if account.is_graphic]
-    else:
-        return accounts_list
+        accounts_list = [account for account in accounts_list if account.priority == priority]
+    if only_graphic:
+        accounts_list = [account for account in accounts_list if account.is_graphic]
+
+    return accounts_list
