@@ -1,6 +1,6 @@
 from offers_scraper import scrape_best_ids, scrape_account, scrape_ids_from_url
 
-from UIVision import generate_json_script, generate_macros_by_priority
+from UIVision import generate_json_script, generate_all_macros
 from utils import get_all_accounts_from_excel
 
 from agency_panel import scrape_planner
@@ -13,7 +13,7 @@ from agency_panel import scrape_planner
 
 # scrape_planner('phrase')
 
-# generate_macros_by_priority()
+# generate_all_macros()
 
 # generate_json_script('last_month', get_all_accounts_from_excel(priority=1), True)
 

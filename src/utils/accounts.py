@@ -34,7 +34,7 @@ class AdsAccount:
             raise ValueError(f'Priority has to be one of these values: {self.VALID_PRIORITIES}')
 
 
-def get_all_accounts_from_excel(*, priority: int = False):
+def get_all_accounts_from_excel(*, priority: int = False, only_graphic=False):
     path = '/home/kajetan/Documents/pryzmat/accounts.xlsx'
     wb = openpyxl.load_workbook(path)
     ws = wb.active
@@ -59,5 +59,7 @@ def get_all_accounts_from_excel(*, priority: int = False):
 
     if priority:
         return [account for account in accounts_list if account.priority == priority]
+    elif only_graphic:
+        return [account for account in accounts_list if account.is_graphic]
     else:
         return accounts_list

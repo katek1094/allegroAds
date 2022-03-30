@@ -23,6 +23,7 @@ class Commands:
         self.open_clients_list = create_click_command('linkText=Przełącz na klienta')
         self.open_client_account = create_xpath_click_command(f"(//*[text()='{account_name}']) ")
         self.open_stats = create_xpath_click_command('//*[@id="main"]/div[2]/div/header/div/div/div[2]/div/div/div/div/div[1]/nav/a[2]')
+        self.open_graphic = create_xpath_click_command('//*[@id="layoutBody"]/div/div/div[2]/div[1]/div/div/a[2]')
         self.open_calendar = create_xpath_click_command('//*[@id="layoutBody"]/div/div/div/div[2]/div')
 
         # calendar range options
