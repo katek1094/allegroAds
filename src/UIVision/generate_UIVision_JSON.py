@@ -18,11 +18,6 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
 
     commands_array = []
 
-    if mode == possible_modes[3] or mode == possible_modes[4]:
-        cmd = Commands('empty')
-        commands_array.append(cmd.open_agency_panel)
-        commands_array.append(cmd.open_clients_list)
-
     for account_name in [account.name for account in accounts_list]:
         commands = Commands(account_name)
 
@@ -38,10 +33,6 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
                 commands.open_calendar,
                 commands.select_last_week,
                 commands.update,
-                # commands.open_orange_select,
-                # commands.select_cost_orange,
-                # commands.open_grey_select,
-                # commands.select_return_grey
             ])
         if mode == possible_modes[2]:  # last month mode
             account_commands_array.extend([
@@ -49,10 +40,6 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
                 commands.open_calendar,
                 commands.select_last_month,
                 commands.update,
-                # commands.open_orange_select,
-                # commands.select_cost_orange,
-                # commands.open_grey_select,
-                # commands.select_return_grey
             ])
 
         if mode == possible_modes[3]:  # last month graphic mode
@@ -62,15 +49,9 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
                 commands.open_calendar,
                 commands.select_last_month,
                 commands.update,
-                # commands.open_orange_select,
-                # commands.select_cost_orange,
-                # commands.open_grey_select,
-                # commands.select_return_grey
             ])
 
         if mode == possible_modes[4]:  # generate reports mode
-            account_commands_array = account_commands_array[2:]
-
             account_commands_array.extend([
                 commands.open_stats,
                 commands.open_calendar,
@@ -82,7 +63,6 @@ def generate_json_script(mode: str, accounts_list: list, dump: bool = False):
             ])
 
         if mode == possible_modes[5]:  # download reports mode
-            account_commands_array = account_commands_array[2:]
             account_commands_array.extend([
                 commands.open_files,
                 commands.click_download_file,

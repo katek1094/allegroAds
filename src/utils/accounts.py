@@ -1,7 +1,4 @@
 import openpyxl
-from google.auth.exceptions import TransportError
-
-from src.google_sheets import update_accounts_list
 
 
 class AdsAccount:
@@ -38,11 +35,6 @@ class AdsAccount:
 
 
 def get_all_accounts_from_excel(*, priority: int = False, only_graphic=False):
-    try:
-        update_accounts_list()
-    except TransportError:
-        print('NO INTERNET CONNECTION. USING LOCAL COPY OF ACCOUNTS LIST')
-
     path = '/home/kajetan/Documents/pryzmat/accounts.xlsx'  # TODO: make it global constant
     wb = openpyxl.load_workbook(path)
     ws = wb.active

@@ -1,9 +1,16 @@
 from offers_scraper import scrape_best_ids, scrape_account, scrape_ids_from_url
+from google.auth.exceptions import TransportError
+
+from src.google_sheets import update_accounts_list
+from src.agency_panel import scrape_planner
 
 from UIVision import generate_json_script, generate_all_macros
 from utils import get_all_accounts_from_excel
 
-from agency_panel import scrape_planner
+try:
+    update_accounts_list()
+except TransportError:
+    print('NO INTERNET CONNECTION. USING LOCAL COPY OF ACCOUNTS LIST')
 
 # scrape_account('account_name')
 

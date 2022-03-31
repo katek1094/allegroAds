@@ -46,7 +46,6 @@ def scrape_results(page_source):
     soup = BeautifulSoup(page_source, 'html5lib')
     table_body = soup.find('tbody')
     trs = table_body.find_all('tr')
-    print(trs)
 
     results = []
 
